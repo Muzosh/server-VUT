@@ -275,4 +275,15 @@ interface IRegistrationContext {
 	 * @since 24.0.0
 	 */
 	public function registerTalkBackend(string $backend): void;
+
+	/**
+	 * Register an implementation of \OCP\UserMigration\IMigrator that
+	 * will handle the implementation of a migrator
+	 *
+	 * @param string $migratorClass
+	 * @psalm-param class-string<\OCP\UserMigration\IMigrator> $migratorClass
+	 * @return void
+	 * @since 24.0.0
+	 */
+	public function registerUserMigrator(string $migratorClass): void;
 }

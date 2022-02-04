@@ -50,6 +50,7 @@ use OCP\Notification\INotifier;
 use OCP\Profile\ILinkAction;
 use OCP\Search\IProvider;
 use OCP\Support\CrashReport\IReporter;
+use OCP\UserMigration\IMigrator as IUserMigrator;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -69,6 +70,9 @@ class RegistrationContext {
 
 	/** @var null|ServiceRegistration<ITalkBackend> */
 	private $talkBackendRegistration = null;
+
+	/** @var ServiceRegistration<IUserMigrator>[] */
+	private $userMigrators = [];
 
 	/** @var ServiceFactoryRegistration[] */
 	private $services = [];
@@ -271,6 +275,13 @@ class RegistrationContext {
 					$backend
 				);
 			}
+
+			public function registerUserMigrator(string $migratorClass): void {
+				$this->context->registerUserMigrator(
+					$this->appId,
+					$migratorClass
+				);
+			}
 		};
 	}
 
@@ -374,6 +385,13 @@ class RegistrationContext {
 		}
 
 		$this->talkBackendRegistration = new ServiceRegistration($appId, $backend);
+	}
+
+	/**
+	 * @psalm-param class-string<IUserMigrator> $migratorClass
+	 */
+	public function registerUserMigrator(string $appId, string $migratorClass): void {
+		$this->userMigrators[] = new ServiceRegistration($appId, $migratorClass);
 	}
 
 	/**
@@ -634,5 +652,12 @@ class RegistrationContext {
 	 */
 	public function getTalkBackendRegistration(): ?ServiceRegistration {
 		return $this->talkBackendRegistration;
+	}
+
+	/**
+	 * @return ServiceRegistration<IUserMigrator>[]
+	 */
+	public function getUserMigrators(): array {
+		return $this->userMigrators;
 	}
 }
