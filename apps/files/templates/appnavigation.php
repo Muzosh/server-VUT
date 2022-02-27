@@ -7,6 +7,7 @@
 		foreach ($_['navigationItems'] as $item) {
 			$pinned = NavigationListElements($item, $l, $pinned);
 		}
+
 		?>
 
 		<?php if ($_['quota'] === \OCP\Files\FileInfo::SPACE_UNLIMITED): ?>
@@ -26,6 +27,43 @@
 				</a>
 			</li>
 		<?php endif; ?>
+				<li>
+					<a href="#"><h2>Fiter Options</h2></a>
+				</li>
+				<li><a href="#"> 
+					<b><label for="fileType">By file type:</label></b>
+					<select id="fileType" name="fileType">
+						<option value="none">None</option>
+						<option value="image">Image</option>
+						<option value="text">Text</option>
+						<option value="diskImage">Disk Image</option>
+					</select> 
+				</a></li>
+				<li>
+					<a href="#">
+						<b>By last editation date:</b>
+						<form id="lastEdit" name="lastEdit">
+							<label for="editFrom">From:</label>
+							<input type="text" id="editFrom" placeholder="YYYY-MM-DD"><br>
+							<label for="editTo">To:</label>&nbsp;
+							<input type="text" id="editTo" placeholder="YYYY-MM-DD">
+						</form>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<b>By file size:</b>
+						<form id="fileSize" name="fileSize">
+							<label for="sizeFrom">From:</label>
+							<input type="text" id="sizeFrom" placeholder="100MB"><br>
+							<label for="sizeTo">To:</label>
+							<input type="text" id="sizeTo" placeholder="100MB">
+						</form>
+					</a>
+				</li>
+				<li>
+				<a href="#"><button>Filter</button></a>
+				</li>
 	</ul>
 	<div id="app-settings">
 		<div id="app-settings-header">

@@ -43,21 +43,32 @@
 				@reset.prevent.stop="onReset">
 				<!-- Search input -->
 				<input ref="input"
-					v-model="query"
+					v-model="queryText"
 					class="unified-search__form-input"
 					type="search"
-					:class="{'unified-search__form-input--with-reset': !!query}"
+					:class="{'unified-search__form-input--with-reset': !!queryArray}"
 					:placeholder="t('core', 'Search {types} …', { types: typesNames.join(', ') })"
 					@input="onInputDebounced"
 					@keypress.enter.prevent.stop="onInputEnter">
 
+				<!-- Additional filters-->
+					<label for="yesno">Test</label>	
+					<input
+						v-model="queryArray"
+						class="unified-search__form-checkbox"
+						id="yesno"
+						type="checkbox"
+						value="test"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+				
 				<!-- Reset search button -->
-				<input v-if="!!query && !isLoading"
+				<input v-if="!!queryArray && !isLoading"
 					type="reset"
 					class="unified-search__form-reset icon-close"
 					:aria-label="t('core','Reset search')"
 					value="">
-			</form>
+			</form>		
 
 			<!-- Search filters -->
 			<Actions v-if="availableFilters.length > 1" class="unified-search__filters" placement="bottom">
@@ -75,9 +86,9 @@
 			<!-- Loading placeholders -->
 			<SearchResultPlaceholders v-if="isLoading" />
 
-			<EmptyContent v-else-if="isValidQuery" icon="icon-search">
-				<Highlight :text="t('core', 'No results for {query}', { query })" :search="query" />
-			</EmptyContent>
+			<!--<EmptyContent v-else-if="isValidQuery" icon="icon-search">
+				<Highlight :text="t('core', 'No results for {query}', { queryArray })" :search="queryArray" />
+			</EmptyContent> -->
 
 			<EmptyContent v-else-if="!isLoading || isShortQuery" icon="icon-search">
 				{{ t('core', 'Start typing to search') }}
@@ -101,7 +112,7 @@
 				<!-- Search results -->
 				<li v-for="(result, index) in limitIfAny(list, type)" :key="result.resourceUrl">
 					<SearchResult v-bind="result"
-						:query="query"
+						:queryArray="queryArray"
 						:focused="focused === 0 && typesIndex === 0 && index === 0"
 						@focus="setFocusedIndex" />
 				</li>
@@ -173,7 +184,8 @@ export default {
 			// List of all results
 			results: {},
 
-			query: '',
+			queryText: "",
+			queryArray: [this.queryText],
 			focused: null,
 
 			defaultLimit,
@@ -238,7 +250,7 @@ export default {
 		usedFiltersIn() {
 			let match
 			const filters = []
-			while ((match = regexFilterIn.exec(this.query)) !== null) {
+			while ((match = regexFilterIn.exec(this.queryArray)) !== null) {
 				filters.push(match[1])
 			}
 			return filters
@@ -251,7 +263,7 @@ export default {
 		usedFiltersNot() {
 			let match
 			const filters = []
-			while ((match = regexFilterNot.exec(this.query)) !== null) {
+			while ((match = regexFilterNot.exec(this.queryArray)) !== null) {
 				filters.push(match[1])
 			}
 			return filters
@@ -262,7 +274,7 @@ export default {
 		 * @returns {boolean}
 		 */
 		isShortQuery() {
-			return this.query && this.query.trim().length < minSearchLength
+			return this.queryArray && this.stringifyQuery().trim().length < minSearchLength
 		},
 
 		/**
@@ -270,7 +282,7 @@ export default {
 		 * @returns {boolean}
 		 */
 		isValidQuery() {
-			return this.query && this.query.trim() !== '' && !this.isShortQuery
+			return this.queryArray && this.stringifyQuery().trim() !== '' && !this.isShortQuery
 		},
 
 		/**
@@ -335,7 +347,7 @@ export default {
 		onReset() {
 			emit('nextcloud:unified-search.reset')
 			this.logger.debug('Search reset')
-			this.query = ''
+			this.query = []
 			this.resetState()
 			this.focusInput()
 		},
@@ -384,19 +396,36 @@ export default {
 		},
 
 		/**
+		 * Create a string from an array of queries
+		 *
+		 * @returns {String}
+		 */
+		stringifyQuery(){
+
+			let query = ""
+			for(const el of this.queryArray){
+				query += el + "::"
+			}
+
+			return query.slice(0, -2)
+		},
+
+		/**
 		 * Start searching on input
 		 */
 		async onInput() {
 			// emit the search query
-			emit('nextcloud:unified-search.search', { query: this.query })
+
+			let query = this.stringifyQuery()
+
+			emit('nextcloud:unified-search.search', { query: query })
 
 			// Do not search if not long enough
-			if (this.query.trim() === '' || this.isShortQuery) {
+			if (query.trim() === '' || this.isShortQuery) {
 				return
 			}
 
 			let types = this.typesIDs
-			let query = this.query
 
 			// Filter out types
 			if (this.usedFiltersNot.length > 0) {
@@ -473,6 +502,7 @@ export default {
 			})
 		},
 		onInputDebounced: debounce(function(e) {
+			this.queryArray[0] = this.queryText
 			this.onInput(e)
 		}, 200),
 
@@ -488,7 +518,7 @@ export default {
 
 			if (this.cursors[type]) {
 				// Init cancellable request
-				const { request, cancel } = search({ type, query: this.query, cursor: this.cursors[type] })
+				const { request, cancel } = search({ type, query: this.stringifyQuery(), cursor: this.cursors[type] })
 				this.requests.push(cancel)
 
 				// Fetch results
@@ -628,9 +658,10 @@ export default {
 		},
 
 		onClickFilter(filter) {
-			this.query = `${this.query} ${filter}`
+			const query = `${this.stringifyQuery()} ${filter}`
 				.replace(/ {2}/g, ' ')
 				.trim()
+			this.queryArray = query.split(" ")
 			this.onInput()
 		},
 	},
