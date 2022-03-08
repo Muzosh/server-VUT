@@ -101,9 +101,25 @@ class FilesSearchProvider implements IProvider {
 	 * @inheritDoc
 	 */
 	public function search(IUser $user, ISearchQuery $query): SearchResult {
+		//Handling of file filters
+		syslog(LOG_INFO, "____");
+		$stringQueryList = explode("__", $query->getTerm());
+		$querySearchBar = array_shift($stringQueryList);
+		$filteredStringQuery = array_filter($stringQueryList, function(string $stringQuery){
+			return strlen($stringQuery);
+		});
+		$queryMatrice = [];
+		foreach($filteredStringQuery as $stringQueryFiltered){
+			$exploded = explode("::", $stringQueryFiltered);
+			if($exploded){
+				$queryMatrice[$exploded[0]] = count($exploded) > 2 ? array($exploded[1], $exploded[2]) : $exploded[1];
+				syslog(LOG_INFO, $queryMatrice[$exploded[0]]);
+			}
+		}
+
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		$fileQuery = new SearchQuery(
-			new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . $query->getTerm() . '%'),
+			new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . $querySearchBar . '%'),
 			$query->getLimit(),
 			(int)$query->getCursor(),
 			$query->getSortOrder() === ISearchQuery::SORT_DATE_DESC ? [
@@ -136,7 +152,7 @@ class FilesSearchProvider implements IProvider {
 				$searchResultEntry->addAttribute('fileId', (string)$result->getId());
 				$searchResultEntry->addAttribute('path', $path);
 				return $searchResultEntry;
-			}, $userFolder->search($fileQuery)),
+			}, $userFolder->search($fileQuery, $queryMatrice)),
 			$query->getCursor() + $query->getLimit()
 		);
 	}

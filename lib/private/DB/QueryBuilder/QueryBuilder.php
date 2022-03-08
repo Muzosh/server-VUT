@@ -898,10 +898,12 @@ class QueryBuilder implements IQueryBuilder {
 	 * @see where()
 	 */
 	public function andWhere(...$where) {
-		call_user_func_array(
-			[$this->queryBuilder, 'andWhere'],
-			$where
-		);
+		if($where){
+			call_user_func_array(
+				[$this->queryBuilder, 'andWhere'],
+				$where
+			);
+		}
 
 		return $this;
 	}

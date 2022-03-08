@@ -666,7 +666,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*************************************************************************************!*\
   !*** ./core/src/views/UnifiedSearch.vue?vue&type=template&id=d79c2f68&scoped=true& ***!
   \*************************************************************************************/
-/*! no static exports found */
+/*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15747,13 +15747,11 @@ function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableTo
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
@@ -16153,7 +16151,8 @@ var REQUEST_CANCELED = 2;
     onReset: function onReset() {
       Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["emit"])('nextcloud:unified-search.reset');
       this.logger.debug('Search reset');
-      this.query = [];
+      this.queryArray = [""];
+      this.queryText = "";
       this.resetState();
       this.focusInput();
     },
@@ -16240,28 +16239,12 @@ var REQUEST_CANCELED = 2;
     },
 
     /**
-     * Create a string from an array of queries
+     * Creates a string from an array of queries.
      *
      * @returns {String}
      */
     stringifyQuery: function stringifyQuery() {
-      var query = "";
-
-      var _iterator = _createForOfIteratorHelper(this.queryArray),
-          _step;
-
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var el = _step.value;
-          query += el + "::";
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-
-      return query.slice(0, -2);
+      return this.queryArray.join("__");
     },
 
     /**
@@ -37394,7 +37377,9 @@ var render = function() {
                 }
               }),
               _vm._v(" "),
-              _c("label", { attrs: { for: "yesno" } }, [_vm._v("Test")]),
+              _c("label", { attrs: { for: "yesno" } }, [
+                _vm._v("Filter text files")
+              ]),
               _vm._v(" "),
               _c("input", {
                 directives: [
@@ -37406,10 +37391,14 @@ var render = function() {
                   }
                 ],
                 staticClass: "unified-search__form-checkbox",
-                attrs: { id: "yesno", type: "checkbox", value: "test" },
+                attrs: {
+                  id: "yesno",
+                  type: "checkbox",
+                  value: "mimetype::text"
+                },
                 domProps: {
                   checked: Array.isArray(_vm.queryArray)
-                    ? _vm._i(_vm.queryArray, "test") > -1
+                    ? _vm._i(_vm.queryArray, "mimetype::text") > -1
                     : _vm.queryArray
                 },
                 on: {
@@ -37430,7 +37419,7 @@ var render = function() {
                       $$el = $event.target,
                       $$c = $$el.checked ? true : false
                     if (Array.isArray($$a)) {
-                      var $$v = "test",
+                      var $$v = "mimetype::text",
                         $$i = _vm._i($$a, $$v)
                       if ($$el.checked) {
                         $$i < 0 && (_vm.queryArray = $$a.concat([$$v]))

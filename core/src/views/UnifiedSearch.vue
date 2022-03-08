@@ -52,13 +52,13 @@
 					@keypress.enter.prevent.stop="onInputEnter">
 
 				<!-- Additional filters-->
-					<label for="yesno">Test</label>	
+					<label for="yesno">Filter text files</label>
 					<input
 						v-model="queryArray"
 						class="unified-search__form-checkbox"
 						id="yesno"
 						type="checkbox"
-						value="test"
+						value="mimetype::text"
 						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 				
@@ -347,7 +347,8 @@ export default {
 		onReset() {
 			emit('nextcloud:unified-search.reset')
 			this.logger.debug('Search reset')
-			this.query = []
+			this.queryArray = [""]
+			this.queryText = ""
 			this.resetState()
 			this.focusInput()
 		},
@@ -396,18 +397,13 @@ export default {
 		},
 
 		/**
-		 * Create a string from an array of queries
+		 * Creates a string from an array of queries.
 		 *
 		 * @returns {String}
 		 */
 		stringifyQuery(){
 
-			let query = ""
-			for(const el of this.queryArray){
-				query += el + "::"
-			}
-
-			return query.slice(0, -2)
+			return this.queryArray.join("__")
 		},
 
 		/**
