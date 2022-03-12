@@ -32,12 +32,14 @@ namespace OCA\Files\Search;
 use OC\Files\Search\SearchComparison;
 use OC\Files\Search\SearchOrder;
 use OC\Files\Search\SearchQuery;
+use OC\Files\Search\SearchBinaryOperator;
 use OCP\Files\FileInfo;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\Files\Search\ISearchComparison;
 use OCP\Files\Node;
 use OCP\Files\Search\ISearchOrder;
+use OCP\Files\Search\ISearchBinaryOperator;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
@@ -104,22 +106,26 @@ class FilesSearchProvider implements IProvider {
 		//Handling of file filters
 		syslog(LOG_INFO, "____");
 		$stringQueryList = explode("__", $query->getTerm());
-		$querySearchBar = array_shift($stringQueryList);
+		$queryArray = [];
+		array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . array_shift($stringQueryList) . '%'));
 		$filteredStringQuery = array_filter($stringQueryList, function(string $stringQuery){
 			return strlen($stringQuery);
 		});
-		$queryMatrice = [];
 		foreach($filteredStringQuery as $stringQueryFiltered){
 			$exploded = explode("::", $stringQueryFiltered);
-			if($exploded){
-				$queryMatrice[$exploded[0]] = count($exploded) > 2 ? array($exploded[1], $exploded[2]) : $exploded[1];
-				syslog(LOG_INFO, $queryMatrice[$exploded[0]]);
+			if(count($exploded) >= 2){
+				switch($exploded[0]){
+					case "mimetype":
+						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', $exploded[1] . '/%'));
+						break;
+				}
 			}
 		}
 
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		$fileQuery = new SearchQuery(
-			new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . $querySearchBar . '%'),
+			new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_AND, $queryArray),
+			/*new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . $querySearchBar . '%'),*/
 			$query->getLimit(),
 			(int)$query->getCursor(),
 			$query->getSortOrder() === ISearchQuery::SORT_DATE_DESC ? [
@@ -152,7 +158,7 @@ class FilesSearchProvider implements IProvider {
 				$searchResultEntry->addAttribute('fileId', (string)$result->getId());
 				$searchResultEntry->addAttribute('path', $path);
 				return $searchResultEntry;
-			}, $userFolder->search($fileQuery, $queryMatrice)),
+			}, $userFolder->search($fileQuery)),
 			$query->getCursor() + $query->getLimit()
 		);
 	}

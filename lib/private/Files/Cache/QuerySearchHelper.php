@@ -83,16 +83,13 @@ class QuerySearchHelper {
 	 * the results will be grouped by the same array keys as the $caches argument to allow
 	 * post-processing based on which cache the result came from.
 	 * 
-	 * Optional argument $filters is a matrice of filtration criteria. Each row can have 2 (for exact value) or 3 columns (for an interval).
-	 * Example $filters = [["fileid", "72"], ["mtime", "5645", "4686868"]]
 	 *
 	 * @template T of array-key
 	 * @param ISearchQuery $searchQuery
 	 * @param array<T, ICache> $caches
-	 * @param array<String> $filters
 	 * @return array<T, ICacheEntry[]>
 	 */
-	public function searchInCaches(ISearchQuery $searchQuery, array $caches, array $filters = null): array {
+	public function searchInCaches(ISearchQuery $searchQuery, array $caches): array {
 		// search in multiple caches at once by creating one query in the following format
 		// SELECT ... FROM oc_filecache WHERE
 		//     <filter expressions from the search query>
@@ -125,11 +122,8 @@ class QuerySearchHelper {
 					$builder->expr()->eq('tagmap.type', 'tag.type'),
 					$builder->expr()->eq('tagmap.categoryid', 'tag.id')
 				))
-				//Added new INNER JOIN for mimetype filtration
-				->innerJoin('file', 'mimetypes', 'mt', $builder->expr()->eq('file.mimepart', 'mt.id'))
 				->andWhere($builder->expr()->eq('tag.type', $builder->createNamedParameter('files')))
-				->andWhere($builder->expr()->eq('tag.uid', $builder->createNamedParameter($user->getUID())))
-				->andWhere(array_key_exists('mimetype', $filters) ? $builder->expr()->eq('mt.mimetype', $builder->createNamedParameter($filters['mimetype'])): null);
+				->andWhere($builder->expr()->eq('tag.uid', $builder->createNamedParameter($user->getUID())));
 		}
 
 		$storageFilters = array_values(array_map(function (ICache $cache) {
@@ -143,26 +137,6 @@ class QuerySearchHelper {
 		if ($searchExpr) {
 			$query->andWhere($searchExpr);
 		}
-
-		//Creates SQL queries from matrice of filters passed from array $filters.
-		//Currently supports filtering by file owner, file size, mime type, date of last edit and newly added user of last edit. 
-		/*foreach($filters as $individualFilter){
-			switch($individualFilter[0]){
-				//Filter by mimetypes
-				case "mimetype":
-					$filterQuery = new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mt.mimetype', $individualFilter[1]);
-					syslog(LOG_INFO, "Query extablished");
-					$this->queryOptimizer->processOperator($filterQuery);
-					syslog(LOG_INFO, "Query optimized");
-					$filterExpr = $this->searchBuilder->searchOperatorToDBExpr($builder, $filterQuery);
-					syslog(LOG_INFO, "Query to DB expression");
-					if($filterExpr){
-						$query->andWhere($filterExpr);
-					}
-					syslog(LOG_INFO, "Query created");
-					break;
-			}
-		}*/
 
 		$this->searchBuilder->addSearchOrdersToQuery($query, $searchQuery->getOrder());
 

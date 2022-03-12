@@ -227,7 +227,7 @@ class Folder extends Node implements \OCP\Files\Folder {
 	 * @param string[] $filters
 	 * @return \OC\Files\Node\Node[]
 	 */
-	public function search($query, $filters = null) {
+	public function search($query) {
 		//Predelat at to bere ARRAY a dela INNER JOIN
 		if (is_string($query)) {
 			$query = $this->queryFromOperator(new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . $query . '%'));
@@ -271,7 +271,7 @@ class Folder extends Node implements \OCP\Files\Folder {
 
 		/** @var QuerySearchHelper $searchHelper */
 		$searchHelper = \OC::$server->get(QuerySearchHelper::class);
-		$resultsPerCache = $searchHelper->searchInCaches($query, $caches, $filters); //HERE
+		$resultsPerCache = $searchHelper->searchInCaches($query, $caches); //HERE
 
 		// loop trough all results per-cache, constructing the FileInfo object from the CacheEntry and merge them all
 		$files = array_merge(...array_map(function (array $results, $relativeMountPoint) use ($mountByMountPoint) {

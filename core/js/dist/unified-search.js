@@ -15894,6 +15894,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 
 
 
@@ -15937,7 +15938,7 @@ var REQUEST_CANCELED = 2;
       // List of all results
       results: {},
       queryText: "",
-      queryArray: [this.queryText],
+      queryArray: [""],
       focused: null,
       defaultLimit: _services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["defaultLimit"],
       minSearchLength: _services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["minSearchLength"],
@@ -16034,7 +16035,7 @@ var REQUEST_CANCELED = 2;
      * @returns {boolean}
      */
     isShortQuery: function isShortQuery() {
-      return this.queryArray && this.stringifyQuery().trim().length < _services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["minSearchLength"];
+      return !this.queryArray || this.queryArray[0].trim().length < _services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["minSearchLength"] && this.queryArray.length < 2;
     },
 
     /**
@@ -16263,16 +16264,19 @@ var REQUEST_CANCELED = 2;
                 query = _this8.stringifyQuery();
                 Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["emit"])('nextcloud:unified-search.search', {
                   query: query
-                }); // Do not search if not long enough
+                });
+                console.log("EMITED"); // Do not search if not long enough
 
-                if (!(query.trim() === '' || _this8.isShortQuery)) {
-                  _context6.next = 4;
+                if (!(query.trim() === '' || query.trim() < _services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["minSearchLength"])) {
+                  _context6.next = 6;
                   break;
                 }
 
+                console.log(query.trim());
                 return _context6.abrupt("return");
 
-              case 4:
+              case 6:
+                console.log("IS NOT SHORT");
                 types = _this8.typesIDs; // Filter out types
 
                 if (_this8.usedFiltersNot.length > 0) {
@@ -16291,10 +16295,10 @@ var REQUEST_CANCELED = 2;
 
                 query = query.replace(_services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["regexFilterIn"], '').replace(_services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["regexFilterNot"], ''); // Reset search if the query changed
 
-                _context6.next = 10;
+                _context6.next = 13;
                 return _this8.resetState();
 
-              case 10:
+              case 13:
                 _this8.$set(_this8.loading, 'all', true);
 
                 _this8.logger.debug("Searching ".concat(query, " in"), types);
@@ -16398,7 +16402,7 @@ var REQUEST_CANCELED = 2;
                   _this8.loading = {};
                 });
 
-              case 13:
+              case 16:
               case "end":
                 return _context6.stop();
             }
@@ -37348,6 +37352,7 @@ var render = function() {
                 },
                 attrs: {
                   type: "search",
+                  value: "",
                   placeholder: _vm.t("core", "Search {types} …", {
                     types: _vm.typesNames.join(", ")
                   })

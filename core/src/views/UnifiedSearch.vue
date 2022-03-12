@@ -46,6 +46,7 @@
 					v-model="queryText"
 					class="unified-search__form-input"
 					type="search"
+					value=""
 					:class="{'unified-search__form-input--with-reset': !!queryArray}"
 					:placeholder="t('core', 'Search {types} …', { types: typesNames.join(', ') })"
 					@input="onInputDebounced"
@@ -185,7 +186,7 @@ export default {
 			results: {},
 
 			queryText: "",
-			queryArray: [this.queryText],
+			queryArray: [""],
 			focused: null,
 
 			defaultLimit,
@@ -274,7 +275,7 @@ export default {
 		 * @returns {boolean}
 		 */
 		isShortQuery() {
-			return this.queryArray && this.stringifyQuery().trim().length < minSearchLength
+			return !this.queryArray || (this.queryArray[0].trim().length < minSearchLength && this.queryArray.length < 2)
 		},
 
 		/**
@@ -415,9 +416,8 @@ export default {
 			let query = this.stringifyQuery()
 
 			emit('nextcloud:unified-search.search', { query: query })
-
 			// Do not search if not long enough
-			if (query.trim() === '' || this.isShortQuery) {
+			if (query.trim() === '' || (query.trim() < minSearchLength)) {
 				return
 			}
 
