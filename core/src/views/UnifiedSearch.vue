@@ -415,7 +415,7 @@ export default {
 
 			let query = this.stringifyQuery()
 
-			emit('nextcloud:unified-search.search', { query: query })
+			emit('nextcloud:unified-search.search', { query: this.queryArray[0] })
 			// Do not search if not long enough
 			if (query.trim() === '' || (query.trim() < minSearchLength)) {
 				return
@@ -475,6 +475,9 @@ export default {
 					if (this.focused === null) {
 						this.focused = 0
 					}
+
+					emit('nextcloud:unified-search.searchFiles', { query: this.orderedResults, cursor: this.cursor})
+
 					return REQUEST_OK
 				} catch (error) {
 					this.$delete(this.results, type)

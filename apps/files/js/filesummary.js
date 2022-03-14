@@ -54,7 +54,7 @@
 			totalDirs: 0,
 			totalHidden: 0,
 			totalSize: 0,
-			filter:'',
+			filter:[''],
 			sumIsPending:false
 		},
 
@@ -75,8 +75,10 @@
 		 * @param {boolean} update whether to update the display
 		 */
 		add: function(file, update) {
-			if (file.name && file.name.toLowerCase().indexOf(this.summary.filter) === -1) {
-				return;
+			for(const individualFilter of this.summary.filter){
+				if (file.name && file.name.indexOf(individualFilter) === -1) {
+					return;
+				}
 			}
 			if (file.type === 'dir' || file.mime === 'httpd/unix-directory') {
 				this.summary.totalDirs++;
@@ -104,7 +106,7 @@
 		 * @param {boolean} update whether to update the display
 		 */
 		remove: function(file, update) {
-			if (file.name && file.name.toLowerCase().indexOf(this.summary.filter) === -1) {
+			if (file.name && file.name.indexOf(this.summary.filter) === -1) {
 				return;
 			}
 			if (file.type === 'dir' || file.mime === 'httpd/unix-directory') {
@@ -125,7 +127,11 @@
 			}
 		},
 		setFilter: function(filter, files){
-			this.summary.filter = filter.toLowerCase();
+			this.summary.filter = [];
+			for(var individualFilter of filter){
+				//console.log("Setting: " + individualFilter);
+				this.summary.filter.push(individualFilter);
+			}
 			this.calculate(files);
 		},
 		/**
@@ -151,8 +157,10 @@
 
 			for (var i = 0; i < files.length; i++) {
 				file = files[i];
-				if (file.name && file.name.toLowerCase().indexOf(this.summary.filter) === -1) {
-					continue;
+				for(const individualFilter of this.summary.filter){
+					if (file.name && file.name.indexOf(individualFilter) === -1) {
+						continue;
+					}
 				}
 				if (file.type === 'dir' || file.mime === 'httpd/unix-directory') {
 					summary.totalDirs++;
@@ -185,7 +193,7 @@
 		setSummary: function(summary) {
 			this.summary = summary;
 			if (typeof this.summary.filter === 'undefined') {
-				this.summary.filter = '';
+				this.summary.filter = [''];
 			}
 			this.update();
 		},
@@ -244,11 +252,11 @@
 				$connector.removeClass('hidden');
 			}
 			$hiddenInfo.toggleClass('hidden', this.summary.totalHidden === 0 || this._showHidden)
-			if (this.summary.filter === '') {
+			if (this.summary.filter[0].length <= 0) {
 				$filterInfo.html('');
 				$filterInfo.addClass('hidden');
 			} else {
-				$filterInfo.html(' ' + n('files', 'matches "{filter}"', 'match "{filter}"', this.summary.totalDirs + this.summary.totalFiles, {filter: this.summary.filter}));
+				$filterInfo.html(' ' + n('files', 'matches "{filter}"', 'match "{filter}"', this.summary.totalDirs + this.summary.totalFiles, {filter: this.summary.filter.join(", ")}));
 				$filterInfo.removeClass('hidden');
 			}
 		},

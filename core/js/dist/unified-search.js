@@ -16263,20 +16263,17 @@ var REQUEST_CANCELED = 2;
                 // emit the search query
                 query = _this8.stringifyQuery();
                 Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["emit"])('nextcloud:unified-search.search', {
-                  query: query
-                });
-                console.log("EMITED"); // Do not search if not long enough
+                  query: _this8.queryArray[0]
+                }); // Do not search if not long enough
 
                 if (!(query.trim() === '' || query.trim() < _services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["minSearchLength"])) {
-                  _context6.next = 6;
+                  _context6.next = 4;
                   break;
                 }
 
-                console.log(query.trim());
                 return _context6.abrupt("return");
 
-              case 6:
-                console.log("IS NOT SHORT");
+              case 4:
                 types = _this8.typesIDs; // Filter out types
 
                 if (_this8.usedFiltersNot.length > 0) {
@@ -16295,10 +16292,10 @@ var REQUEST_CANCELED = 2;
 
                 query = query.replace(_services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["regexFilterIn"], '').replace(_services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["regexFilterNot"], ''); // Reset search if the query changed
 
-                _context6.next = 13;
+                _context6.next = 10;
                 return _this8.resetState();
 
-              case 13:
+              case 10:
                 _this8.$set(_this8.loading, 'all', true);
 
                 _this8.logger.debug("Searching ".concat(query, " in"), types);
@@ -16354,17 +16351,22 @@ var REQUEST_CANCELED = 2;
                               _this8.focused = 0;
                             }
 
+                            Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["emit"])('nextcloud:unified-search.searchFiles', {
+                              query: _this8.orderedResults
+                              /*, cursor: this.cursor */
+
+                            });
                             return _context5.abrupt("return", REQUEST_OK);
 
-                          case 14:
-                            _context5.prev = 14;
+                          case 15:
+                            _context5.prev = 15;
                             _context5.t0 = _context5["catch"](0);
 
                             _this8.$delete(_this8.results, type); // If this is not a cancelled throw
 
 
                             if (!(_context5.t0.response && _context5.t0.response.status)) {
-                              _context5.next = 21;
+                              _context5.next = 22;
                               break;
                             }
 
@@ -16375,15 +16377,15 @@ var REQUEST_CANCELED = 2;
                             }));
                             return _context5.abrupt("return", REQUEST_FAILED);
 
-                          case 21:
+                          case 22:
                             return _context5.abrupt("return", REQUEST_CANCELED);
 
-                          case 22:
+                          case 23:
                           case "end":
                             return _context5.stop();
                         }
                       }
-                    }, _callee5, null, [[0, 14]]);
+                    }, _callee5, null, [[0, 15]]);
                   }));
 
                   return function (_x) {
@@ -16402,7 +16404,7 @@ var REQUEST_CANCELED = 2;
                   _this8.loading = {};
                 });
 
-              case 16:
+              case 13:
               case "end":
                 return _context6.stop();
             }

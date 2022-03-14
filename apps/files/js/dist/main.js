@@ -357,13 +357,21 @@ __webpack_require__.r(__webpack_exports__);
     attach: function attach(fileList) {
       var _this = this;
 
-      Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["subscribe"])('nextcloud:unified-search.search', function (_ref) {
+      Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["subscribe"])('nextcloud:unified-search.searchFiles', function (_ref) {
         var query = _ref.query;
-        fileList.setFilter(query);
+        var cursor = _ref.cursor;
+        var resultArray = [];
+        if(query.length > 0){
+          for(const data of query[0].list){
+            resultArray.push(data.title);
+          }
+          console.log("RECEIVED");
+          fileList.setFilter(resultArray, cursor);
+        }
       });
       Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["subscribe"])('nextcloud:unified-search.reset', function () {
         _this.query = null;
-        fileList.setFilter('');
+        fileList.setFilter(['']);
       });
     }
   };

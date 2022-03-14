@@ -168,9 +168,9 @@
 
 		/**
 		 * If not empty, only files containing this string will be shown
-		 * @type String
+		 * @type String[]
 		 */
-		_filter: '',
+		_filter: [''],
 
 		/**
 		 * @type Backbone.Model
@@ -1431,7 +1431,9 @@
 			while (count > 0 && index < this.files.length) {
 				fileData = this.files[index];
 				if (this._filter) {
-					hidden = fileData.name.toLowerCase().indexOf(this._filter.toLowerCase()) === -1;
+					for(var individualFilter of this._filter){
+						hidden = fileData.name.indexOf(individualFilter) === -1;
+					}
 				} else {
 					hidden = false;
 				}
@@ -3341,13 +3343,13 @@
 		 * @deprecated use setFilter(filter)
 		 */
 		filter:function(query) {
-			this.setFilter('');
+			this.setFilter(['']);
 		},
 		/**
 		 * @deprecated use setFilter('')
 		 */
 		unfilter:function() {
-			this.setFilter('');
+			this.setFilter(['']);
 		},
 		/**
 		 * hide files matching the given filter
@@ -3358,6 +3360,7 @@
 			if (this._filter === filter) {
 				return;
 			}
+
 			this._filter = filter;
 			this.fileSummary.setFilter(filter, this.files);
 			total = this.fileSummary.getTotal();
@@ -3366,25 +3369,33 @@
 			}
 
 			var visibleCount = 0;
-			filter = filter.toLowerCase();
+			/*for(var individualFilter of filter){
+				individualFilter = individualFilter.toLowerCase();
+			}*/
 
 			function filterRows(tr) {
 				var $e = $(tr);
-				if ($e.data('file').toString().toLowerCase().indexOf(filter) === -1) {
-					$e.addClass('hidden');
-				} else {
-					visibleCount++;
-					$e.removeClass('hidden');
+				for(var individualFilter of filter){
+					//console.log("Setting: " + individualFilter);
+					console.log("Considered: " + individualFilter);
+					if ($e.data('file').toString().indexOf(individualFilter) !== -1) {
+						console.log("Shown: " + individualFilter);
+						visibleCount++;
+						$e.removeClass('hidden');
+					}
 				}
 			}
 
-			var $trs = this.$fileList.find('tr');
-			do {
-				_.each($trs, filterRows);
-				if (visibleCount < total) {
-					$trs = this._nextPage(false);
-				}
-			} while (visibleCount < total && $trs.length > 0);
+			//if(filter.length > 0 && filter[0] !== ''){
+				var $trs = this.$fileList.find('tr');
+				$($trs).addClass('hidden');
+				do {
+					_.each($trs, filterRows);
+					if (visibleCount < total) {
+						$trs = this._nextPage(false);
+					}
+				} while (visibleCount < total && $trs.length > 0);
+			//}
 
 			this.$container.trigger('scroll');
 		},
@@ -3396,8 +3407,8 @@
 				$('#searchresults .emptycontent').addClass('emptycontent-search');
 				if ( $('#searchresults').length === 0 || $('#searchresults').hasClass('hidden') ) {
 					var error;
-					if (this._filter.length > 2) {
-						error = t('files', 'No search results in other folders for {tag}{filter}{endtag}', {filter:this._filter});
+					if (this._filter.length > 0 && this._filter[0].length > 0) {
+						error = t('files', 'No search results in other folders for {tag}{filter}{endtag}', {filter:this._filter.join(", ")});
 					} else {
 						error = t('files', 'Enter more than two characters to search in other folders');
 					}
