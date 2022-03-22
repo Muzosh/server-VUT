@@ -3377,9 +3377,9 @@
 				var $e = $(tr);
 				for(var individualFilter of filter){
 					//console.log("Setting: " + individualFilter);
-					console.log("Considered: " + individualFilter);
+					//console.log("Considered: " + individualFilter);
 					if ($e.data('file').toString().indexOf(individualFilter) !== -1) {
-						console.log("Shown: " + individualFilter);
+						//console.log("Shown: " + individualFilter);
 						visibleCount++;
 						$e.removeClass('hidden');
 					}

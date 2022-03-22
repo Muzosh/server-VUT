@@ -43,35 +43,116 @@
 				@reset.prevent.stop="onReset">
 				<!-- Search input -->
 				<input ref="input"
-					v-model="queryText"
+					v-model="queryObject.name"
 					class="unified-search__form-input"
 					type="search"
 					value=""
-					:class="{'unified-search__form-input--with-reset': !!queryArray}"
+					:class="{'unified-search__form-input--with-reset': !!queryObject}"
 					:placeholder="t('core', 'Search {types} …', { types: typesNames.join(', ') })"
 					@input="onInputDebounced"
 					@keypress.enter.prevent.stop="onInputEnter">
 
 				<!-- Additional filters-->
-					<label for="yesno">Filter text files</label>
-					<input
-						v-model="queryArray"
-						class="unified-search__form-checkbox"
-						id="yesno"
-						type="checkbox"
-						value="mimetype::text"
-						@input="onInputDebounced"
-						@keypress.enter.prevent.stop="onInputEnter">
+				<!-- Media type selector-->
+				<select
+					v-model="queryObject.mimetype"
+					class="unified-search__form-mimetype"
+					id="mimetype"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+					<option disabled value="">Media type</option>
+					<option value="text">Text</option>
+					<option value="images">Images</option>
+					<option value="video">Video</option>
+					<option value="audio">Audio</option>
+					<option value="disk_image">Disk image</option>
+					<option value="">None</option>
+				</select>
 				
+				<!--File size selector-->
+				<input
+					v-model="queryObject.size.sizeMoreThan.size"
+					class="unified-search__form-morethan"
+					id="morethan"
+					value=""
+					placeholder="eg. 1000"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+				<select
+					v-model="queryObject.size.sizeMoreThan.unit"
+					class="unified-search__form-morethan-unit"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+					<option>MB</option>
+					<option>B</option>
+					<option>KB</option>
+					<option>GB</option>
+				</select>
+
+				<input
+					v-model="queryObject.size.sizeLessThan.size"
+					class="unified-search__form-lessthan"
+					id="lessthan"
+					value=""
+					placeholder="eg. 1000"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+				<select
+					v-model="queryObject.size.sizeLessThan.unit"
+					class="unified-search__form-lessthan-unit"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+					<option>MB</option>
+					<option>B</option>
+					<option>KB</option>
+					<option>GB</option>
+				</select>
+
+				<!--Owner selector-->
+				<input
+					v-model="queryObject.owner"
+					class="unified-search__form-owner"
+					id="owner"
+					value=""
+					placeholder="File owner"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+				
+				<!--Last edit date-->
+				<select
+					v-model="queryObject.date.month"
+					class="unified-search__form-date-month"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+					<option disabled value="">Month</option>
+					<option v-for="month in getMonthsArray">{{ month }}</option>
+				</select>
+				<select
+					v-model="queryObject.date.day"
+					class="unified-search__form-date-day"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+					<option disabled value="">Day</option>
+					<option v-for="day in getDayArray">{{ day }}</option>
+				</select>
+				<select
+					v-model="queryObject.date.year"
+					class="unified-search__form-date-year"
+					@input="onInputDebounced"
+					@keypress.enter.prevent.stop="onInputEnter">
+					<option disabled value="">Year</option>
+					<option v-for="year in getYearArray">{{ year }}</option>
+				</select>
+
 				<!-- Reset search button -->
-				<input v-if="!!queryArray && !isLoading"
+				<input v-if="!!queryObject && !isLoading"
 					type="reset"
 					class="unified-search__form-reset icon-close"
 					:aria-label="t('core','Reset search')"
 					value="">
 			</form>		
 
-			<!-- Search filters -->
+			<!-- Search filters--> 
 			<Actions v-if="availableFilters.length > 1" class="unified-search__filters" placement="bottom">
 				<ActionButton v-for="type in availableFilters"
 					:key="type"
@@ -113,7 +194,7 @@
 				<!-- Search results -->
 				<li v-for="(result, index) in limitIfAny(list, type)" :key="result.resourceUrl">
 					<SearchResult v-bind="result"
-						:queryArray="queryArray"
+						:queryObject="queryObject"
 						:focused="focused === 0 && typesIndex === 0 && index === 0"
 						@focus="setFocusedIndex" />
 				</li>
@@ -185,10 +266,27 @@ export default {
 			// List of all results
 			results: {},
 
-			queryText: "",
-			queryArray: [""],
+			queryObject: {
+							name: "",
+							mimetype: "",
+							size:{
+								sizeMoreThan: {
+									size: "",
+									unit: "MB"
+								},
+								sizeLessThan: {
+									size: "",
+									unit: "MB"
+								},
+							},
+							owner: "",
+							date: {
+								month: "0",
+								day: "0",
+								year: "0"
+							}
+						},
 			focused: null,
-
 			defaultLimit,
 			minSearchLength,
 
@@ -223,6 +321,34 @@ export default {
 		},
 
 		/**
+		 * Returns array of days
+		 * @returns {Array}
+		 */
+		getDayArray(){
+			const dayArray = new Array(31)
+			return Array.from(dayArray.keys()).map(x => x + 1)
+		},
+
+		/**
+		 * Returns array of months
+		 * @returns {Array}
+		 */
+		getMonthsArray(){
+			const dayArray = new Array(12)
+			return Array.from(dayArray.keys()).map(x => x + 1)
+		},
+		
+		/**
+		 * Returns array of years
+		 * @returns {Array}
+		 */
+		getYearArray(){
+			const todayDate = new Date()
+			const yearArray = new Array(todayDate.getFullYear() - 1970)
+			return Array.from(yearArray.keys()).map(x => x + 1970)
+		},
+
+		/**
 		 * Return ordered results
 		 * @returns {Array}
 		 */
@@ -251,7 +377,7 @@ export default {
 		usedFiltersIn() {
 			let match
 			const filters = []
-			while ((match = regexFilterIn.exec(this.queryArray)) !== null) {
+			while ((match = regexFilterIn.exec(this.queryObject)) !== null) {
 				filters.push(match[1])
 			}
 			return filters
@@ -264,7 +390,7 @@ export default {
 		usedFiltersNot() {
 			let match
 			const filters = []
-			while ((match = regexFilterNot.exec(this.queryArray)) !== null) {
+			while ((match = regexFilterNot.exec(this.queryObject)) !== null) {
 				filters.push(match[1])
 			}
 			return filters
@@ -275,7 +401,7 @@ export default {
 		 * @returns {boolean}
 		 */
 		isShortQuery() {
-			return !this.queryArray || (this.queryArray[0].trim().length < minSearchLength && this.queryArray.length < 2)
+			return !this.queryObject || (this.queryObject.name.trim().length < minSearchLength && this.stringifyQuery().split("__").length < 2)
 		},
 
 		/**
@@ -283,7 +409,7 @@ export default {
 		 * @returns {boolean}
 		 */
 		isValidQuery() {
-			return this.queryArray && this.stringifyQuery().trim() !== '' && !this.isShortQuery
+			return this.queryObject && this.stringifyQuery().trim() !== '' && !this.isShortQuery
 		},
 
 		/**
@@ -348,8 +474,26 @@ export default {
 		onReset() {
 			emit('nextcloud:unified-search.reset')
 			this.logger.debug('Search reset')
-			this.queryArray = [""]
-			this.queryText = ""
+			this.queryObject = {
+								name: "",
+								mimetype: "",
+								size:{
+									sizeMoreThan: {
+									size: "",
+									unit: "MB"
+									},
+									sizeLessThan: {
+										size: "",
+										unit: "MB"
+									},
+								},
+								owner: "",
+								date: {
+									month: 0,
+									day: 0,
+									year: 0
+								}
+							}
 			this.resetState()
 			this.focusInput()
 		},
@@ -398,13 +542,38 @@ export default {
 		},
 
 		/**
-		 * Creates a string from an array of queries.
+		 * Creates a string from an Object of queries.
 		 *
 		 * @returns {String}
 		 */
 		stringifyQuery(){
+			var resultArray = [""]
+			
+			resultArray[0] = this.queryObject.name
+			if(this.queryObject.size.sizeMoreThan.size !== ""){
+				resultArray.push("gte::" + this.queryObject.size.sizeMoreThan.size.toString() + "::" + this.queryObject.size.sizeMoreThan.unit.toString())
+			}
 
-			return this.queryArray.join("__")
+			if(this.queryObject.size.sizeLessThan.size !== ""){
+				resultArray.push("lte::" + this.queryObject.size.sizeLessThan.size.toString() + "::" + this.queryObject.size.sizeLessThan.unit.toString())
+			}
+
+			if(this.queryObject.mimetype !== ""){
+				resultArray.push("mimetype::" + this.queryObject.mimetype)
+			}
+
+			if(this.queryObject.owner !== ""){
+				resultArray.push("owner::" + this.queryObject.owner)
+			}
+
+			if(this.queryObject.date.month !== 0 && this.queryObject.date.day !== 0 && this.queryObject.date.year !== 0){
+				resultArray.push("date::" + 
+									this.queryObject.date.month.toString() + "::" + 
+									this.queryObject.date.day.toString() + "::" +
+									this.queryObject.date.year.toString())
+			}
+
+			return resultArray.join("__")
 		},
 
 		/**
@@ -415,8 +584,8 @@ export default {
 
 			let query = this.stringifyQuery()
 
-			emit('nextcloud:unified-search.search', { query: this.queryArray[0] })
-			// Do not search if not long enough
+			emit('nextcloud:unified-search.search', { query: this.queryObject.name })
+			// Do not search if not long enoug
 			if (query.trim() === '' || (query.trim() < minSearchLength)) {
 				return
 			}
@@ -493,6 +662,7 @@ export default {
 			})).then(results => {
 				// Do not declare loading finished if the request have been cancelled
 				// This means another search was triggered and we're therefore still loading
+				//emit('nextcloud:unified-search.searchFiles', { query: this.orderedResults, cursor: this.cursor})
 				if (results.some(result => result === REQUEST_CANCELED)) {
 					return
 				}
@@ -501,7 +671,6 @@ export default {
 			})
 		},
 		onInputDebounced: debounce(function(e) {
-			this.queryArray[0] = this.queryText
 			this.onInput(e)
 		}, 200),
 
@@ -657,10 +826,11 @@ export default {
 		},
 
 		onClickFilter(filter) {
-			const query = `${this.stringifyQuery()} ${filter}`
+			const query = `${this.queryObject.name} ${filter}`
 				.replace(/ {2}/g, ' ')
 				.trim()
-			this.queryArray = query.split(" ")
+			
+			this.queryObject.name = query
 			this.onInput()
 		},
 	},

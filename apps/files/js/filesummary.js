@@ -76,7 +76,8 @@
 		 */
 		add: function(file, update) {
 			for(const individualFilter of this.summary.filter){
-				if (file.name && file.name.indexOf(individualFilter) === -1) {
+				if (file.name && file.name.toLowerCase().indexOf(individualFilter.toLowerCase()) === -1) {
+					console.log("Added: " + individualFilter);
 					return;
 				}
 			}
@@ -158,7 +159,8 @@
 			for (var i = 0; i < files.length; i++) {
 				file = files[i];
 				for(const individualFilter of this.summary.filter){
-					if (file.name && file.name.indexOf(individualFilter) === -1) {
+					if (file.name && file.name.toLowerCase().indexOf(individualFilter.toLowerCase()) === -1) {
+						console.log("Calculated")
 						continue;
 					}
 				}
@@ -213,6 +215,9 @@
 		 * Renders the file summary element
 		 */
 		update: function() {
+			if(1===1){
+				return;
+			}
 			if (!this.$el) {
 				return;
 			}

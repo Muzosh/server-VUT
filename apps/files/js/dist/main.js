@@ -358,6 +358,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["subscribe"])('nextcloud:unified-search.searchFiles', function (_ref) {
+        console.log(JSON.stringify(_ref))
         var query = _ref.query;
         var cursor = _ref.cursor;
         var resultArray = [];

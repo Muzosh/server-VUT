@@ -118,6 +118,21 @@ class FilesSearchProvider implements IProvider {
 					case "mimetype":
 						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', $exploded[1] . '/%'));
 						break;
+					case "owner":
+						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'uid_owner', '%' . $exploded[1] . '%'));
+						break;
+					case "size":
+						if(count($exploded) >= 3){
+							array_push($queryArray, new SearchComparison(ISearchComparison::GREATER_THAN, 'size', $exploded[1]));
+							array_push($queryArray, new SearchComparison(ISearchComparison::LESS_THAN, 'size', $exploded[2]));
+						}
+						break;
+					case "date":
+						if(count($exploded) >= 3){
+							array_push($queryArray, new SearchComparison(ISearchComparison::GREATER_THAN, 'mtime', $exploded[1]));
+							array_push($queryArray, new SearchComparison(ISearchComparison::LESS_THAN, 'mtime', $exploded[2]));
+						}
+						break;
 				}
 			}
 		}
@@ -125,7 +140,6 @@ class FilesSearchProvider implements IProvider {
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		$fileQuery = new SearchQuery(
 			new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_AND, $queryArray),
-			/*new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . $querySearchBar . '%'),*/
 			$query->getLimit(),
 			(int)$query->getCursor(),
 			$query->getSortOrder() === ISearchQuery::SORT_DATE_DESC ? [
