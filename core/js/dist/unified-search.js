@@ -37609,7 +37609,7 @@ var render = function() {
                   _vm._v(" "),
                   _c("option", { attrs: { value: "text" } }, [_vm._v("Text")]),
                   _vm._v(" "),
-                  _c("option", { attrs: { value: "images" } }, [
+                  _c("option", { attrs: { value: "image" } }, [
                     _vm._v("Images")
                   ]),
                   _vm._v(" "),

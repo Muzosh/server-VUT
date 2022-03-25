@@ -171,6 +171,9 @@ class SearchBuilder {
 			$field = 'path_hash';
 			$value = md5((string)$value);
 		}
+		elseif ($field === 'owner'){
+			$field = 'sh.uid_owner';
+		}
 		return [$field, $value, $type];
 	}
 
@@ -185,6 +188,7 @@ class SearchBuilder {
 			'favorite' => 'boolean',
 			'fileid' => 'integer',
 			'storage' => 'integer',
+			'owner' => 'string',
 		];
 		$comparisons = [
 			'mimetype' => ['eq', 'like'],
@@ -196,6 +200,7 @@ class SearchBuilder {
 			'favorite' => ['eq'],
 			'fileid' => ['eq'],
 			'storage' => ['eq'],
+			'owner' => ['eq', 'like'],
 		];
 
 		if (!isset($types[$operator->getField()])) {

@@ -62,7 +62,7 @@
 					@keypress.enter.prevent.stop="onInputEnter">
 					<option disabled value="">Media type</option>
 					<option value="text">Text</option>
-					<option value="images">Images</option>
+					<option value="image">Images</option>
 					<option value="video">Video</option>
 					<option value="audio">Audio</option>
 					<option value="disk_image">Disk image</option>
@@ -87,6 +87,7 @@
 					<option>B</option>
 					<option>KB</option>
 					<option>GB</option>
+					<option>TB</option>
 				</select>
 
 				<input
@@ -106,6 +107,7 @@
 					<option>B</option>
 					<option>KB</option>
 					<option>GB</option>
+					<option>TB</option>
 				</select>
 
 				<!--Owner selector-->
@@ -344,8 +346,8 @@ export default {
 		 */
 		getYearArray(){
 			const todayDate = new Date()
-			const yearArray = new Array(todayDate.getFullYear() - 1970)
-			return Array.from(yearArray.keys()).map(x => x + 1970)
+			const yearArray = new Array(todayDate.getFullYear() - 1971)
+			return Array.from(yearArray.keys()).map(x => x + 1971).reverse()
 		},
 
 		/**
@@ -566,7 +568,7 @@ export default {
 				resultArray.push("owner::" + this.queryObject.owner)
 			}
 
-			if(this.queryObject.date.month !== 0 && this.queryObject.date.day !== 0 && this.queryObject.date.year !== 0){
+			if(this.queryObject.date.month != 0 && this.queryObject.date.day != 0 && this.queryObject.date.year != 0){
 				resultArray.push("date::" + 
 									this.queryObject.date.month.toString() + "::" + 
 									this.queryObject.date.day.toString() + "::" +

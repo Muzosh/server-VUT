@@ -3360,6 +3360,7 @@
 			if (this._filter === filter) {
 				return;
 			}
+			console.log("FILTERING");
 
 			this._filter = filter;
 			this.fileSummary.setFilter(filter, this.files);
@@ -3388,6 +3389,7 @@
 
 			//if(filter.length > 0 && filter[0] !== ''){
 				var $trs = this.$fileList.find('tr');
+				//console.log("HIDING");
 				$($trs).addClass('hidden');
 				do {
 					_.each($trs, filterRows);

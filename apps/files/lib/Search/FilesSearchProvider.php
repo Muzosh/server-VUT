@@ -105,26 +105,60 @@ class FilesSearchProvider implements IProvider {
 	public function search(IUser $user, ISearchQuery $query): SearchResult {
 		//Handling of file filters
 		syslog(LOG_INFO, "____");
+		$UNITS = array(
+			"B" => 1,
+			"KB" => 1000,
+			"MB" => 1000000,
+			"GB" => 1000000000,
+			"TB" => 1000000000000,
+		);
+
 		$stringQueryList = explode("__", $query->getTerm());
 		$queryArray = [];
 		array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . array_shift($stringQueryList) . '%'));
 		$filteredStringQuery = array_filter($stringQueryList, function(string $stringQuery){
 			return strlen($stringQuery);
 		});
+
 		foreach($filteredStringQuery as $stringQueryFiltered){
 			$exploded = explode("::", $stringQueryFiltered);
 			if(count($exploded) >= 2){
 				switch($exploded[0]){
 					case "mimetype":
-						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', $exploded[1] . '/%'));
+						switch($exploded[1]){
+							case "text":
+								$provisionalQueryArray = [
+														new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'text/%'),
+														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/pdf'),
+														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/msword'),
+														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+													];
+								$provisionalQuery = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $provisionalQueryArray);
+								break;
+							case "disk_image":
+								$provisionalQuery = new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'application/%');
+								array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', '%-disk-image'));
+								break;
+							default:
+								$provisionalQuery = new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', $exploded[1] . '/%');
+						}
+						array_push($queryArray, $provisionalQuery);
 						break;
 					case "owner":
-						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'uid_owner', '%' . $exploded[1] . '%'));
+						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'owner', '%' . $exploded[1] . '%'));
 						break;
-					case "size":
+					case "lte":
 						if(count($exploded) >= 3){
-							array_push($queryArray, new SearchComparison(ISearchComparison::GREATER_THAN, 'size', $exploded[1]));
-							array_push($queryArray, new SearchComparison(ISearchComparison::LESS_THAN, 'size', $exploded[2]));
+							syslog(LOG_INFO, "LTE");
+							//array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'path', 'files%'));
+							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LESS_THAN_EQUAL, 'size', (int)$exploded[1] * $UNITS[$exploded[2]]));
+						}
+						break;
+					case "gte":
+						if(count($exploded) >= 3){
+							syslog(LOG_INFO, "GTE");
+							//array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'path', 'files%'));
+							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_GREATER_THAN_EQUAL, 'size', (int)$exploded[1] * $UNITS[$exploded[2]]));
 						}
 						break;
 					case "date":
