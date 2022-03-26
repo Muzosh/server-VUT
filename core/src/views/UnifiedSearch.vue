@@ -54,97 +54,115 @@
 
 				<!-- Additional filters-->
 				<!-- Media type selector-->
-				<select
-					v-model="queryObject.mimetype"
-					class="unified-search__form-mimetype"
-					id="mimetype"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
-					<option disabled value="">Media type</option>
-					<option value="text">Text</option>
-					<option value="image">Images</option>
-					<option value="video">Video</option>
-					<option value="audio">Audio</option>
-					<option value="disk_image">Disk image</option>
-					<option value="">None</option>
-				</select>
+				<div class="unified-search__form-mimetype">
+					<label for="morethan">Type of media</label>
+					<select
+						v-model="queryObject.mimetype"
+						class="unified-search__form-mimetype-selector"
+						id="mimetype"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option disabled value="">Media type</option>
+						<option value="text">Text</option>
+						<option value="image">Images</option>
+						<option value="video">Video</option>
+						<option value="audio">Audio</option>
+						<option value="disk_image">Disk image</option>
+						<option value="">None</option>
+					</select>
+				</div>
 				
 				<!--File size selector-->
-				<input
-					v-model="queryObject.size.sizeMoreThan.size"
-					class="unified-search__form-morethan"
-					id="morethan"
-					value=""
-					placeholder="eg. 1000"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
-				<select
-					v-model="queryObject.size.sizeMoreThan.unit"
-					class="unified-search__form-morethan-unit"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
-					<option>MB</option>
-					<option>B</option>
-					<option>KB</option>
-					<option>GB</option>
-					<option>TB</option>
-				</select>
+				<div class="unified-search__form-morethan">
+					<label for="morethan">Size more than</label>
+					<input
+						v-model="queryObject.size.sizeMoreThan.size"
+						class="unified-search__form-morethan-selector"
+						id="morethan"
+						value=""
+						placeholder="eg. 1000"
+						v-on:keypress="isNumber($event)"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+					<select
+						v-model="queryObject.size.sizeMoreThan.unit"
+						class="unified-search__form-morethan-unit-selector"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option>MB</option>
+						<option>B</option>
+						<option>KB</option>
+						<option>GB</option>
+						<option>TB</option>
+					</select>
+				</div>
 
-				<input
-					v-model="queryObject.size.sizeLessThan.size"
-					class="unified-search__form-lessthan"
-					id="lessthan"
-					value=""
-					placeholder="eg. 1000"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
-				<select
-					v-model="queryObject.size.sizeLessThan.unit"
-					class="unified-search__form-lessthan-unit"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
-					<option>MB</option>
-					<option>B</option>
-					<option>KB</option>
-					<option>GB</option>
-					<option>TB</option>
-				</select>
+				<div class="unified-search__form-lessthan">
+					<label for="lessthan">Size less than</label>
+					<input
+						v-model="queryObject.size.sizeLessThan.size"
+						class="unified-search__form-lessthan-selector"
+						id="lessthan"
+						value=""
+						placeholder="eg. 1000"
+						v-on:keypress="isNumber($event)"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+					<select
+						v-model="queryObject.size.sizeLessThan.unit"
+						class="unified-search__form-lessthan-unit"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option>MB</option>
+						<option>B</option>
+						<option>KB</option>
+						<option>GB</option>
+						<option>TB</option>
+					</select>
+				</div>
 
 				<!--Owner selector-->
-				<input
-					v-model="queryObject.owner"
-					class="unified-search__form-owner"
-					id="owner"
-					value=""
-					placeholder="File owner"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
+				<div class="unified-search__form-owner">
+					<label for="owner">File owner</label>
+					<input
+						v-model="queryObject.owner"
+						class="unified-search__form-owner-selector"
+						id="owner"
+						value=""
+						placeholder="File owner"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+				</div>
 				
 				<!--Last edit date-->
-				<select
-					v-model="queryObject.date.month"
-					class="unified-search__form-date-month"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
-					<option disabled value="">Month</option>
-					<option v-for="month in getMonthsArray">{{ month }}</option>
-				</select>
-				<select
-					v-model="queryObject.date.day"
-					class="unified-search__form-date-day"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
-					<option disabled value="">Day</option>
-					<option v-for="day in getDayArray">{{ day }}</option>
-				</select>
-				<select
-					v-model="queryObject.date.year"
-					class="unified-search__form-date-year"
-					@input="onInputDebounced"
-					@keypress.enter.prevent.stop="onInputEnter">
-					<option disabled value="">Year</option>
-					<option v-for="year in getYearArray">{{ year }}</option>
-				</select>
+				<div class="unified-search__form-date">
+					<label for="date-month">Last edit</label>
+					<select
+						v-model="queryObject.date.month"
+						class="unified-search__form-date-month"
+						id="date-month"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option disabled value="">Month</option>
+						<option v-for="month in getMonthsArray">{{ month }}</option>
+					</select>
+					<select
+						v-model="queryObject.date.day"
+						class="unified-search__form-date-day"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option disabled value="">Day</option>
+						<option v-for="day in getDayArray">{{ day }}</option>
+					</select>
+					<select
+						v-model="queryObject.date.year"
+						class="unified-search__form-date-year"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option disabled value="">Year</option>
+						<option v-for="year in getYearArray">{{ year }}</option>
+					</select>
+				</div>
 
 				<!-- Reset search button -->
 				<input v-if="!!queryObject && !isLoading"
@@ -336,8 +354,8 @@ export default {
 		 * @returns {Array}
 		 */
 		getMonthsArray(){
-			const dayArray = new Array(12)
-			return Array.from(dayArray.keys()).map(x => x + 1)
+			return ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+					 "November", "December"]
 		},
 		
 		/**
@@ -346,7 +364,7 @@ export default {
 		 */
 		getYearArray(){
 			const todayDate = new Date()
-			const yearArray = new Array(todayDate.getFullYear() - 1971)
+			const yearArray = new Array(todayDate.getFullYear() - 1970)
 			return Array.from(yearArray.keys()).map(x => x + 1971).reverse()
 		},
 
@@ -466,6 +484,15 @@ export default {
 			// Update types list in the background
 			this.types = await getTypes()
 		},
+		/*
+		 * Checks if passed char is a number. For input fields.
+		 */
+		isNumber(e){
+			var chr = String.fromCharCode(e.keyCode)
+			if(chr.match(/[1-9]/g)){
+				return true
+			}else e.preventDefault()
+		},
 		onClose() {
 			emit('nextcloud:unified-search.close')
 		},
@@ -550,8 +577,9 @@ export default {
 		 */
 		stringifyQuery(){
 			var resultArray = [""]
-			
-			resultArray[0] = this.queryObject.name
+			if(!this.queryObject.name.includes("__")){
+				resultArray[0] = this.queryObject.name
+			}
 			if(this.queryObject.size.sizeMoreThan.size !== ""){
 				resultArray.push("gte::" + this.queryObject.size.sizeMoreThan.size.toString() + "::" + this.queryObject.size.sizeMoreThan.unit.toString())
 			}

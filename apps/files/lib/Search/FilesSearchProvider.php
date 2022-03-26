@@ -162,9 +162,10 @@ class FilesSearchProvider implements IProvider {
 						}
 						break;
 					case "date":
-						if(count($exploded) >= 3){
-							array_push($queryArray, new SearchComparison(ISearchComparison::GREATER_THAN, 'mtime', $exploded[1]));
-							array_push($queryArray, new SearchComparison(ISearchComparison::LESS_THAN, 'mtime', $exploded[2]));
+						if(count($exploded) >= 4){
+						syslog(LOG_INFO, /*(string)strtotime(*/$exploded[2] . " " . $exploded[1] . " " . $exploded[3]/*)*/);
+							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_GREATER_THAN_EQUAL, 'mtime', strtotime($exploded[2] . " " . $exploded[1] . " " . $exploded[3])));
+							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LESS_THAN, 'mtime', 86400 + strtotime($exploded[2] . " " . $exploded[1] . " " . $exploded[3])));
 						}
 						break;
 				}
