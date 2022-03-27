@@ -174,6 +174,9 @@ class SearchBuilder {
 		elseif ($field === 'owner'){
 			$field = 'sh.uid_owner';
 		}
+		elseif($field === 'parent'){
+			$field = 'file.parent';
+		}
 		return [$field, $value, $type];
 	}
 
@@ -189,6 +192,7 @@ class SearchBuilder {
 			'fileid' => 'integer',
 			'storage' => 'integer',
 			'owner' => 'string',
+			'parent' => 'integer',
 		];
 		$comparisons = [
 			'mimetype' => ['eq', 'like'],
@@ -201,6 +205,7 @@ class SearchBuilder {
 			'fileid' => ['eq'],
 			'storage' => ['eq'],
 			'owner' => ['eq', 'like'],
+			'parent' => ['eq']
 		];
 
 		if (!isset($types[$operator->getField()])) {

@@ -116,6 +116,8 @@ class FilesSearchProvider implements IProvider {
 		$stringQueryList = explode("__", $query->getTerm());
 		$queryArray = [];
 		array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . array_shift($stringQueryList) . '%'));
+		if(array_key_exists("fileid", $query->getRouteParameters()))
+			array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]));
 		$filteredStringQuery = array_filter($stringQueryList, function(string $stringQuery){
 			return strlen($stringQuery);
 		});

@@ -15996,6 +15996,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -16053,9 +16061,9 @@ var REQUEST_CANCELED = 2;
         },
         owner: "",
         date: {
-          month: "0",
-          day: "0",
-          year: "0"
+          month: "",
+          day: "",
+          year: ""
         }
       },
       focused: null,
@@ -16299,12 +16307,25 @@ var REQUEST_CANCELED = 2;
     isNumber: function isNumber(e) {
       var chr = String.fromCharCode(e.keyCode);
 
-      if (chr.match(/[1-9]/g)) {
+      if (chr.match(/[0-9]/g)) {
         return true;
       } else e.preventDefault();
     },
     onClose: function onClose() {
       Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["emit"])('nextcloud:unified-search.close');
+    },
+
+    /*
+     * Reset date search state
+     */
+    onResetDate: function onResetDate() {
+      this.logger.debug('Search reset date');
+      this.queryObject.date = {
+        month: "",
+        day: "",
+        year: ""
+      };
+      this.onInput();
     },
 
     /**
@@ -16328,9 +16349,9 @@ var REQUEST_CANCELED = 2;
         },
         owner: "",
         date: {
-          month: 0,
-          day: 0,
-          year: 0
+          month: "",
+          day: "",
+          year: ""
         }
       };
       this.resetState();
@@ -16446,7 +16467,7 @@ var REQUEST_CANCELED = 2;
         resultArray.push("owner::" + this.queryObject.owner);
       }
 
-      if (this.queryObject.date.month != 0 && this.queryObject.date.day != 0 && this.queryObject.date.year != 0) {
+      if (this.queryObject.date.month !== "" && this.queryObject.date.day !== "" && this.queryObject.date.year !== "") {
         resultArray.push("date::" + this.queryObject.date.month.toString() + "::" + this.queryObject.date.day.toString() + "::" + this.queryObject.date.year.toString());
       }
 
@@ -22810,7 +22831,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.i, ".notifications:not(:empty) ~ #unified-search[data-v-261cf1f8] {\n  order: -1;\n}\n.notifications:not(:empty) ~ #unified-search .header-menu__carret[data-v-261cf1f8] {\n  right: 175px;\n}\n.header-menu__trigger[data-v-261cf1f8] {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 50px;\n  height: 100%;\n  margin: 0;\n  padding: 0;\n  cursor: pointer;\n  opacity: 0.6;\n}\n.header-menu--opened .header-menu__trigger[data-v-261cf1f8], .header-menu__trigger[data-v-261cf1f8]:hover, .header-menu__trigger[data-v-261cf1f8]:focus, .header-menu__trigger[data-v-261cf1f8]:active {\n  opacity: 1;\n}\n.header-menu__wrapper[data-v-261cf1f8] {\n  position: fixed;\n  z-index: 2000;\n  top: 50px;\n  right: 0;\n  box-sizing: border-box;\n  margin: 0;\n  border-radius: 0 0 var(--border-radius) var(--border-radius);\n  background-color: var(--color-main-background);\n  filter: drop-shadow(0 1px 5px var(--color-box-shadow));\n}\n.header-menu__carret[data-v-261cf1f8] {\n  position: absolute;\n  right: 128px;\n  bottom: 100%;\n  width: 0;\n  height: 0;\n  content: \" \";\n  pointer-events: none;\n  border: 10px solid transparent;\n  border-bottom-color: var(--color-main-background);\n}\n.header-menu__content[data-v-261cf1f8] {\n  overflow: auto;\n  width: 360px;\n  max-width: 100vw;\n  min-height: calc(44px * 1.5);\n  max-height: calc(100vh - 50px * 2);\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.i, ".notifications:not(:empty) ~ #unified-search[data-v-261cf1f8] {\n  order: -1;\n}\n.notifications:not(:empty) ~ #unified-search .header-menu__carret[data-v-261cf1f8] {\n  right: 175px;\n}\n.header-menu__trigger[data-v-261cf1f8] {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 50px;\n  height: 100%;\n  margin: 0;\n  padding: 0;\n  cursor: pointer;\n  opacity: 0.6;\n}\n.header-menu--opened .header-menu__trigger[data-v-261cf1f8], .header-menu__trigger[data-v-261cf1f8]:hover, .header-menu__trigger[data-v-261cf1f8]:focus, .header-menu__trigger[data-v-261cf1f8]:active {\n  opacity: 1;\n}\n.header-menu__wrapper[data-v-261cf1f8] {\n  position: fixed;\n  z-index: 2000;\n  top: 50px;\n  right: 0;\n  box-sizing: border-box;\n  margin: 0;\n  border-radius: 0 0 var(--border-radius) var(--border-radius);\n  background-color: var(--color-main-background);\n  filter: drop-shadow(0 1px 5px var(--color-box-shadow));\n}\n.header-menu__carret[data-v-261cf1f8] {\n  position: absolute;\n  right: 128px;\n  bottom: 100%;\n  width: 0;\n  height: 0;\n  content: \" \";\n  pointer-events: none;\n  border: 10px solid transparent;\n  border-bottom-color: var(--color-main-background);\n}\n.header-menu__content[data-v-261cf1f8] {\n  overflow: auto;\n  width: 380px;\n  max-width: 100vw;\n  min-height: calc(44px * 1.5);\n  max-height: calc(100vh - 50px * 2);\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
@@ -22876,7 +22897,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.i, ".unified-search__trigger[data-v-d79c2f68] {\n  width: 20px;\n  height: 20px;\n}\n.unified-search__input-wrapper[data-v-d79c2f68] {\n  position: sticky;\n  z-index: 2;\n  top: 0;\n  display: inline-flex;\n  align-items: center;\n  width: 100%;\n  background-color: var(--color-main-background);\n}\n.unified-search__filters[data-v-d79c2f68] {\n  margin: 5px 10px;\n}\n.unified-search__filters ul[data-v-d79c2f68] {\n  display: inline-flex;\n  justify-content: space-between;\n}\n.unified-search__form[data-v-d79c2f68] {\n  position: relative;\n  width: 100%;\n  margin: 10px;\n}\n.unified-search__form[data-v-d79c2f68]::after {\n  right: 6px;\n  left: auto;\n}\n.unified-search__form-input[data-v-d79c2f68], .unified-search__form-reset[data-v-d79c2f68] {\n  margin: 3px;\n}\n.unified-search__form-input[data-v-d79c2f68] {\n  width: 100%;\n  height: 34px;\n  padding: 6px;\n}\n.unified-search__form-input[data-v-d79c2f68], .unified-search__form-input[placeholder][data-v-d79c2f68], .unified-search__form-input[data-v-d79c2f68]::placeholder {\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.unified-search__form-input[data-v-d79c2f68]::-webkit-search-decoration, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-cancel-button, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-results-button, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-results-decoration {\n  -webkit-appearance: none;\n}\n.icon-loading-small .unified-search__form-input[data-v-d79c2f68], .unified-search__form-input--with-reset[data-v-d79c2f68] {\n  padding-right: 34px;\n}\n.unified-search__form-reset[data-v-d79c2f68] {\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 28px;\n  height: 28px;\n  padding: 0;\n  opacity: 0.5;\n  border: none;\n  background-color: transparent;\n  margin-right: 0;\n}\n.unified-search__form-reset[data-v-d79c2f68]:hover, .unified-search__form-reset[data-v-d79c2f68]:focus, .unified-search__form-reset[data-v-d79c2f68]:active {\n  opacity: 1;\n}\n.unified-search__filters[data-v-d79c2f68] {\n  margin-right: 5px;\n}\n.unified-search__results[data-v-d79c2f68]::before {\n  display: block;\n  margin: 10px;\n  margin-left: 16px;\n  content: attr(aria-label);\n  color: var(--color-primary-element);\n}\n.unified-search .unified-search__result-more[data-v-d79c2f68] {\n  color: var(--color-text-maxcontrast);\n}\n.unified-search .empty-content[data-v-d79c2f68] {\n  margin: 10vh 0;\n}\n.unified-search .empty-content[data-v-d79c2f68]  .empty-content__title {\n  font-weight: normal;\n  font-size: var(--default-font-size);\n  padding: 0 15px;\n  text-align: center;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.i, ".unified-search__trigger[data-v-d79c2f68] {\n  width: 20px;\n  height: 20px;\n}\n.unified-search__input-wrapper[data-v-d79c2f68] {\n  position: sticky;\n  z-index: 2;\n  top: 0;\n  display: inline-flex;\n  align-items: center;\n  width: 100%;\n  background-color: var(--color-main-background);\n}\n.unified-search__filters[data-v-d79c2f68] {\n  margin: 5px 10px;\n}\n.unified-search__filters ul[data-v-d79c2f68] {\n  display: inline-flex;\n  justify-content: space-between;\n}\n.unified-search__form[data-v-d79c2f68] {\n  position: relative;\n  width: 100%;\n  margin: 10px;\n}\n.unified-search__form[data-v-d79c2f68]::after {\n  right: 6px;\n  left: auto;\n}\n.unified-search__form-input[data-v-d79c2f68], .unified-search__form-reset[data-v-d79c2f68] {\n  margin: 3px;\n}\n.unified-search__form-input[data-v-d79c2f68] {\n  width: 100%;\n  height: 34px;\n  padding: 6px;\n}\n.unified-search__form-input[data-v-d79c2f68], .unified-search__form-input[placeholder][data-v-d79c2f68], .unified-search__form-input[data-v-d79c2f68]::placeholder {\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.unified-search__form-input[data-v-d79c2f68]::-webkit-search-decoration, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-cancel-button, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-results-button, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-results-decoration {\n  -webkit-appearance: none;\n}\n.icon-loading-small .unified-search__form-input[data-v-d79c2f68], .unified-search__form-input--with-reset[data-v-d79c2f68] {\n  padding-right: 34px;\n}\n.unified-search__form-reset[data-v-d79c2f68] {\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 28px;\n  height: 28px;\n  padding: 0;\n  opacity: 0.5;\n  border: none;\n  background-color: transparent;\n  margin-right: 0;\n}\n.unified-search__form-reset[data-v-d79c2f68]:hover, .unified-search__form-reset[data-v-d79c2f68]:focus, .unified-search__form-reset[data-v-d79c2f68]:active {\n  opacity: 1;\n}\n.unified-search__form-reset-date[data-v-d79c2f68] {\n  position: absolute;\n  right: 0;\n  width: 28px;\n  height: 28px;\n  padding: 0;\n  opacity: 0.5;\n  border: none;\n  background-color: transparent;\n  margin-right: 0;\n}\n.unified-search__form-reset-date[data-v-d79c2f68]:hover, .unified-search__form-reset-date[data-v-d79c2f68]:focus, .unified-search__form-reset-date[data-v-d79c2f68]:active {\n  opacity: 1;\n}\n.unified-search__filters[data-v-d79c2f68] {\n  margin-right: 5px;\n}\n.unified-search__results[data-v-d79c2f68]::before {\n  display: block;\n  margin: 10px;\n  margin-left: 16px;\n  content: attr(aria-label);\n  color: var(--color-primary-element);\n}\n.unified-search .unified-search__result-more[data-v-d79c2f68] {\n  color: var(--color-text-maxcontrast);\n}\n.unified-search .empty-content[data-v-d79c2f68] {\n  margin: 10vh 0;\n}\n.unified-search .empty-content[data-v-d79c2f68]  .empty-content__title {\n  font-weight: normal;\n  font-size: var(--default-font-size);\n  padding: 0 15px;\n  text-align: center;\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
@@ -38146,7 +38167,17 @@ var render = function() {
                     })
                   ],
                   2
-                )
+                ),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "unified-search__form-reset-date icon-close",
+                  attrs: {
+                    type: "reset-date",
+                    "aria-label": _vm.t("core", "Reset search"),
+                    value: ""
+                  },
+                  on: { input: _vm.onResetDate }
+                })
               ]),
               _vm._v(" "),
               !!_vm.queryObject && !_vm.isLoading

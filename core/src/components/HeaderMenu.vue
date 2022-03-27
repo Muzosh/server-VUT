@@ -216,7 +216,7 @@ export default {
 
 	&__content {
 		overflow: auto;
-		width: 360px;
+		width: 380px;
 		max-width: 100vw;
 		min-height: calc(44px * 1.5);
 		max-height: calc(100vh - 50px * 2);

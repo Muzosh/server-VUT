@@ -162,6 +162,7 @@ class UnifiedSearchController extends OCSController {
 		return [
 			$routeStr,
 			$parameters,
+			$url
 		];
 	}
 }

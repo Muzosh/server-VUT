@@ -301,9 +301,9 @@ export default {
 							},
 							owner: "",
 							date: {
-								month: "0",
-								day: "0",
-								year: "0"
+								month: "",
+								day: "",
+								year: ""
 							}
 						},
 			focused: null,
@@ -489,7 +489,7 @@ export default {
 		 */
 		isNumber(e){
 			var chr = String.fromCharCode(e.keyCode)
-			if(chr.match(/[1-9]/g)){
+			if(chr.match(/[0-9]/g)){
 				return true
 			}else e.preventDefault()
 		},
@@ -518,9 +518,9 @@ export default {
 								},
 								owner: "",
 								date: {
-									month: 0,
-									day: 0,
-									year: 0
+									month: "",
+									day: "",
+									year: ""
 								}
 							}
 			this.resetState()
@@ -596,7 +596,7 @@ export default {
 				resultArray.push("owner::" + this.queryObject.owner)
 			}
 
-			if(this.queryObject.date.month != 0 && this.queryObject.date.day != 0 && this.queryObject.date.year != 0){
+			if(this.queryObject.date.month !== "" && this.queryObject.date.day !== "" && this.queryObject.date.year !== ""){
 				resultArray.push("date::" + 
 									this.queryObject.date.month.toString() + "::" + 
 									this.queryObject.date.day.toString() + "::" +
