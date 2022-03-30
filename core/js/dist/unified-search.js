@@ -15998,12 +15998,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 
 
@@ -16315,19 +16309,6 @@ var REQUEST_CANCELED = 2;
       Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["emit"])('nextcloud:unified-search.close');
     },
 
-    /*
-     * Reset date search state
-     */
-    onResetDate: function onResetDate() {
-      this.logger.debug('Search reset date');
-      this.queryObject.date = {
-        month: "",
-        day: "",
-        year: ""
-      };
-      this.onInput();
-    },
-
     /**
      * Reset the search state
      */
@@ -16578,8 +16559,7 @@ var REQUEST_CANCELED = 2;
                             }
 
                             Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["emit"])('nextcloud:unified-search.searchFiles', {
-                              query: _this8.orderedResults,
-                              cursor: _this8.cursor
+                              query: _this8.orderedResults
                             });
                             return _context5.abrupt("return", REQUEST_OK);
 
@@ -16619,7 +16599,6 @@ var REQUEST_CANCELED = 2;
                 }())).then(function (results) {
                   // Do not declare loading finished if the request have been cancelled
                   // This means another search was triggered and we're therefore still loading
-                  //emit('nextcloud:unified-search.searchFiles', { query: this.orderedResults, cursor: this.cursor})
                   if (results.some(function (result) {
                     return result === REQUEST_CANCELED;
                   })) {
@@ -22897,7 +22876,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.i, ".unified-search__trigger[data-v-d79c2f68] {\n  width: 20px;\n  height: 20px;\n}\n.unified-search__input-wrapper[data-v-d79c2f68] {\n  position: sticky;\n  z-index: 2;\n  top: 0;\n  display: inline-flex;\n  align-items: center;\n  width: 100%;\n  background-color: var(--color-main-background);\n}\n.unified-search__filters[data-v-d79c2f68] {\n  margin: 5px 10px;\n}\n.unified-search__filters ul[data-v-d79c2f68] {\n  display: inline-flex;\n  justify-content: space-between;\n}\n.unified-search__form[data-v-d79c2f68] {\n  position: relative;\n  width: 100%;\n  margin: 10px;\n}\n.unified-search__form[data-v-d79c2f68]::after {\n  right: 6px;\n  left: auto;\n}\n.unified-search__form-input[data-v-d79c2f68], .unified-search__form-reset[data-v-d79c2f68] {\n  margin: 3px;\n}\n.unified-search__form-input[data-v-d79c2f68] {\n  width: 100%;\n  height: 34px;\n  padding: 6px;\n}\n.unified-search__form-input[data-v-d79c2f68], .unified-search__form-input[placeholder][data-v-d79c2f68], .unified-search__form-input[data-v-d79c2f68]::placeholder {\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.unified-search__form-input[data-v-d79c2f68]::-webkit-search-decoration, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-cancel-button, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-results-button, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-results-decoration {\n  -webkit-appearance: none;\n}\n.icon-loading-small .unified-search__form-input[data-v-d79c2f68], .unified-search__form-input--with-reset[data-v-d79c2f68] {\n  padding-right: 34px;\n}\n.unified-search__form-reset[data-v-d79c2f68] {\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 28px;\n  height: 28px;\n  padding: 0;\n  opacity: 0.5;\n  border: none;\n  background-color: transparent;\n  margin-right: 0;\n}\n.unified-search__form-reset[data-v-d79c2f68]:hover, .unified-search__form-reset[data-v-d79c2f68]:focus, .unified-search__form-reset[data-v-d79c2f68]:active {\n  opacity: 1;\n}\n.unified-search__form-reset-date[data-v-d79c2f68] {\n  position: absolute;\n  right: 0;\n  width: 28px;\n  height: 28px;\n  padding: 0;\n  opacity: 0.5;\n  border: none;\n  background-color: transparent;\n  margin-right: 0;\n}\n.unified-search__form-reset-date[data-v-d79c2f68]:hover, .unified-search__form-reset-date[data-v-d79c2f68]:focus, .unified-search__form-reset-date[data-v-d79c2f68]:active {\n  opacity: 1;\n}\n.unified-search__filters[data-v-d79c2f68] {\n  margin-right: 5px;\n}\n.unified-search__results[data-v-d79c2f68]::before {\n  display: block;\n  margin: 10px;\n  margin-left: 16px;\n  content: attr(aria-label);\n  color: var(--color-primary-element);\n}\n.unified-search .unified-search__result-more[data-v-d79c2f68] {\n  color: var(--color-text-maxcontrast);\n}\n.unified-search .empty-content[data-v-d79c2f68] {\n  margin: 10vh 0;\n}\n.unified-search .empty-content[data-v-d79c2f68]  .empty-content__title {\n  font-weight: normal;\n  font-size: var(--default-font-size);\n  padding: 0 15px;\n  text-align: center;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.i, ".unified-search__trigger[data-v-d79c2f68] {\n  width: 20px;\n  height: 20px;\n}\n.unified-search__input-wrapper[data-v-d79c2f68] {\n  position: sticky;\n  z-index: 2;\n  top: 0;\n  display: inline-flex;\n  align-items: center;\n  width: 100%;\n  background-color: var(--color-main-background);\n}\n.unified-search__filters[data-v-d79c2f68] {\n  margin: 5px 10px;\n}\n.unified-search__filters ul[data-v-d79c2f68] {\n  display: inline-flex;\n  justify-content: space-between;\n}\n.unified-search__form[data-v-d79c2f68] {\n  position: relative;\n  width: 100%;\n  margin: 10px;\n}\n.unified-search__form[data-v-d79c2f68]::after {\n  right: 6px;\n  left: auto;\n}\n.unified-search__form-input[data-v-d79c2f68], .unified-search__form-reset[data-v-d79c2f68] {\n  margin: 3px;\n}\n.unified-search__form-input[data-v-d79c2f68] {\n  width: 100%;\n  height: 34px;\n  padding: 6px;\n}\n.unified-search__form-input[data-v-d79c2f68], .unified-search__form-input[placeholder][data-v-d79c2f68], .unified-search__form-input[data-v-d79c2f68]::placeholder {\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.unified-search__form-input[data-v-d79c2f68]::-webkit-search-decoration, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-cancel-button, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-results-button, .unified-search__form-input[data-v-d79c2f68]::-webkit-search-results-decoration {\n  -webkit-appearance: none;\n}\n.icon-loading-small .unified-search__form-input[data-v-d79c2f68], .unified-search__form-input--with-reset[data-v-d79c2f68] {\n  padding-right: 34px;\n}\n.unified-search__form-reset[data-v-d79c2f68] {\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 28px;\n  height: 28px;\n  padding: 0;\n  opacity: 0.5;\n  border: none;\n  background-color: transparent;\n  margin-right: 0;\n}\n.unified-search__form-reset[data-v-d79c2f68]:hover, .unified-search__form-reset[data-v-d79c2f68]:focus, .unified-search__form-reset[data-v-d79c2f68]:active {\n  opacity: 1;\n}\n.unified-search__filters[data-v-d79c2f68] {\n  margin-right: 5px;\n}\n.unified-search__results[data-v-d79c2f68]::before {\n  display: block;\n  margin: 10px;\n  margin-left: 16px;\n  content: attr(aria-label);\n  color: var(--color-primary-element);\n}\n.unified-search .unified-search__result-more[data-v-d79c2f68] {\n  color: var(--color-text-maxcontrast);\n}\n.unified-search .empty-content[data-v-d79c2f68] {\n  margin: 10vh 0;\n}\n.unified-search .empty-content[data-v-d79c2f68]  .empty-content__title {\n  font-weight: normal;\n  font-size: var(--default-font-size);\n  padding: 0 15px;\n  text-align: center;\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
@@ -38167,17 +38146,7 @@ var render = function() {
                     })
                   ],
                   2
-                ),
-                _vm._v(" "),
-                _c("input", {
-                  staticClass: "unified-search__form-reset-date icon-close",
-                  attrs: {
-                    type: "reset-date",
-                    "aria-label": _vm.t("core", "Reset search"),
-                    value: ""
-                  },
-                  on: { input: _vm.onResetDate }
-                })
+                )
               ]),
               _vm._v(" "),
               !!_vm.queryObject && !_vm.isLoading
@@ -38228,56 +38197,7 @@ var render = function() {
       ),
       _vm._v(" "),
       !_vm.hasResults
-        ? [
-            _vm.isLoading
-              ? _c("SearchResultPlaceholders")
-              : !_vm.isLoading || _vm.isShortQuery
-              ? _c(
-                  "EmptyContent",
-                  {
-                    attrs: { icon: "icon-search" },
-                    scopedSlots: _vm._u(
-                      [
-                        _vm.isShortQuery
-                          ? {
-                              key: "desc",
-                              fn: function() {
-                                return [
-                                  _vm._v(
-                                    "\n\t\t\t\t" +
-                                      _vm._s(
-                                        _vm.n(
-                                          "core",
-                                          "Please enter {minSearchLength} character or more to search",
-                                          "Please enter {minSearchLength} characters  or more to search",
-                                          _vm.minSearchLength,
-                                          {
-                                            minSearchLength: _vm.minSearchLength
-                                          }
-                                        )
-                                      ) +
-                                      "\n\t\t\t"
-                                  )
-                                ]
-                              },
-                              proxy: true
-                            }
-                          : null
-                      ],
-                      null,
-                      true
-                    )
-                  },
-                  [
-                    _vm._v(
-                      "\n\t\t\t" +
-                        _vm._s(_vm.t("core", "Start typing to search")) +
-                        "\n\t\t\t"
-                    )
-                  ]
-                )
-              : _vm._e()
-          ]
+        ? [_vm.isLoading ? _c("SearchResultPlaceholders") : _vm._e()]
         : _vm._l(_vm.orderedResults, function(ref, typesIndex) {
             var list = ref.list
             var type = ref.type
@@ -38289,63 +38209,34 @@ var render = function() {
                 class: "unified-search__results-" + type,
                 attrs: { "aria-label": _vm.typesMap[type] }
               },
-              [
-                _vm._l(_vm.limitIfAny(list, type), function(result, index) {
-                  return _c(
-                    "li",
-                    { key: result.resourceUrl },
-                    [
-                      _c(
-                        "SearchResult",
-                        _vm._b(
-                          {
-                            attrs: {
-                              queryObject: _vm.queryObject,
-                              focused:
-                                _vm.focused === 0 &&
-                                typesIndex === 0 &&
-                                index === 0
-                            },
-                            on: { focus: _vm.setFocusedIndex }
-                          },
-                          "SearchResult",
-                          result,
-                          false
-                        )
-                      )
-                    ],
-                    1
-                  )
-                }),
-                _vm._v(" "),
-                _c(
+              _vm._l(_vm.limitIfAny(list, type), function(result, index) {
+                return _c(
                   "li",
+                  { key: result.resourceUrl },
                   [
-                    !_vm.reached[type]
-                      ? _c("SearchResult", {
-                          staticClass: "unified-search__result-more",
+                    _c(
+                      "SearchResult",
+                      _vm._b(
+                        {
                           attrs: {
-                            title: _vm.loading[type]
-                              ? _vm.t("core", "Loading more results …")
-                              : _vm.t("core", "Load more results"),
-                            "icon-class": _vm.loading[type]
-                              ? "icon-loading-small"
-                              : ""
+                            queryObject: _vm.queryObject,
+                            focused:
+                              _vm.focused === 0 &&
+                              typesIndex === 0 &&
+                              index === 0
                           },
-                          on: {
-                            click: function($event) {
-                              $event.preventDefault()
-                              return _vm.loadMore(type)
-                            },
-                            focus: _vm.setFocusedIndex
-                          }
-                        })
-                      : _vm._e()
+                          on: { focus: _vm.setFocusedIndex }
+                        },
+                        "SearchResult",
+                        result,
+                        false
+                      )
+                    )
                   ],
                   1
                 )
-              ],
-              2
+              }),
+              0
             )
           })
     ],

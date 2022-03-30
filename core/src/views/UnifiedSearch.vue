@@ -190,7 +190,7 @@
 
 			<!--<EmptyContent v-else-if="isValidQuery" icon="icon-search">
 				<Highlight :text="t('core', 'No results for {query}', { queryArray })" :search="queryArray" />
-			</EmptyContent> -->
+			</EmptyContent> 
 
 			<EmptyContent v-else-if="!isLoading || isShortQuery" icon="icon-search">
 				{{ t('core', 'Start typing to search') }}
@@ -202,6 +202,7 @@
 						{minSearchLength}) }}
 				</template>
 			</EmptyContent>
+			-->
 		</template>
 
 		<!-- Grouped search results -->
@@ -219,9 +220,9 @@
 						@focus="setFocusedIndex" />
 				</li>
 
-				<!-- Load more button -->
+				<!-- Load more button 
 				<li>
-					<SearchResult v-if="!reached[type]"
+					<SearchResult v-if="!reached[type] && "
 						class="unified-search__result-more"
 						:title="loading[type]
 							? t('core', 'Loading more results …')
@@ -230,6 +231,7 @@
 						@click.prevent="loadMore(type)"
 						@focus="setFocusedIndex" />
 				</li>
+				-->
 			</ul>
 		</template>
 	</HeaderMenu>
@@ -674,8 +676,8 @@ export default {
 					if (this.focused === null) {
 						this.focused = 0
 					}
-
-					emit('nextcloud:unified-search.searchFiles', { query: this.orderedResults, cursor: this.cursor})
+					
+					emit('nextcloud:unified-search.searchFiles', { query: this.orderedResults})
 
 					return REQUEST_OK
 				} catch (error) {
@@ -692,7 +694,6 @@ export default {
 			})).then(results => {
 				// Do not declare loading finished if the request have been cancelled
 				// This means another search was triggered and we're therefore still loading
-				//emit('nextcloud:unified-search.searchFiles', { query: this.orderedResults, cursor: this.cursor})
 				if (results.some(result => result === REQUEST_CANCELED)) {
 					return
 				}
@@ -713,7 +714,6 @@ export default {
 			if (this.loading[type]) {
 				return
 			}
-
 			if (this.cursors[type]) {
 				// Init cancellable request
 				const { request, cancel } = search({ type, query: this.stringifyQuery(), cursor: this.cursors[type] })
@@ -721,7 +721,6 @@ export default {
 
 				// Fetch results
 				const { data } = await request()
-
 				// Save cursor if any
 				if (data.ocs.data.cursor) {
 					this.$set(this.cursors, type, data.ocs.data.cursor)
@@ -737,7 +736,6 @@ export default {
 					this.$set(this.reached, type, true)
 				}
 			} else
-
 			// If no cursor, we might have all the results already,
 			// let's fake pagination and show the next xxx entries
 			if (this.limits[type] && this.limits[type] >= 0) {
@@ -748,13 +746,13 @@ export default {
 					this.$set(this.reached, type, true)
 				}
 			}
-
 			// Focus result after render
 			if (this.focused !== null) {
 				this.$nextTick(() => {
 					this.focusIndex(this.focused)
 				})
 			}
+
 		},
 
 		/**

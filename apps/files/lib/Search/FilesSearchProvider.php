@@ -116,8 +116,13 @@ class FilesSearchProvider implements IProvider {
 		$stringQueryList = explode("__", $query->getTerm());
 		$queryArray = [];
 		array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . array_shift($stringQueryList) . '%'));
-		if(array_key_exists("fileid", $query->getRouteParameters()))
-			array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]));
+		if(array_key_exists("fileid", $query->getRouteParameters())){
+			$queryCompare = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, [
+				new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]),
+				new SearchComparison(ISearchComparison::COMPARE_LIKE, 'owner', "%%")
+			]);
+			array_push($queryArray, $queryCompare);
+		}
 		$filteredStringQuery = array_filter($stringQueryList, function(string $stringQuery){
 			return strlen($stringQuery);
 		});
@@ -173,11 +178,11 @@ class FilesSearchProvider implements IProvider {
 				}
 			}
 		}
-
+		syslog(LOG_INFO, (string)$query->getLimit());
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		$fileQuery = new SearchQuery(
 			new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_AND, $queryArray),
-			$query->getLimit(),
+			/*$query->getLimit()*/ 999,
 			(int)$query->getCursor(),
 			$query->getSortOrder() === ISearchQuery::SORT_DATE_DESC ? [
 				new SearchOrder(ISearchOrder::DIRECTION_DESCENDING, 'mtime'),
