@@ -26,12 +26,18 @@ import { subscribe } from '@nextcloud/event-bus'
 
 	const FilesPlugin = {
 		attach(fileList) {
-			subscribe('nextcloud:unified-search.search', ({ query }) => {
-				fileList.setFilter(query)
+			subscribe('nextcloud:unified-search.searchFiles', ({ query }) => {
+				var resultArray = [];
+				if(query.length > 0){
+				  for(const data of query[0].list){
+					resultArray.push(data.title);
+				  }
+				  fileList.setFilter(resultArray/*, cursor*/);
+				}else fileList.setFilter([]);
 			})
 			subscribe('nextcloud:unified-search.reset', () => {
 				this.query = null
-				fileList.setFilter('')
+				fileList.setFilter(['']);
 			})
 
 		},

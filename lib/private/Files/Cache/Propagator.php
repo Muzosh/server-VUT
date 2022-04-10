@@ -26,6 +26,7 @@ namespace OC\Files\Cache;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Files\Cache\IPropagator;
 use OCP\IDBConnection;
+use OCP\IUserSession;
 
 /**
  * Propagate etags and mtimes within the storage
@@ -89,6 +90,28 @@ class Propagator implements IPropagator {
 			return $builder->expr()->literal($hash);
 		}, $parentHashes);
 
+		//Updates newly created property 'last_updater' in the 'share' upon file update.
+		//The statement is split into two requests. One selects ID of the concerned file from 'filecache' table.
+		//The other updates the 'share' table with selected IDs.
+		$builder = $this->connection->getQueryBuilder();
+		$builder->select('fileid')
+			->from('filecache', 'file')
+			->where($builder->expr()->eq('storage', $builder->createNamedParameter($storageId, IQueryBuilder::PARAM_INT)))
+			->where($builder->expr()->eq('path_hash', $builder->createNamedParameter(md5($internalPath), IQueryBuilder::PARAM_STR)));
+		$result = $builder->execute()->fetch();
+		if($result){
+			$fileidShare = $result["fileid"];
+			syslog(LOG_INFO, "FileID: ". $fileidShare . ", Internal path: " . $internalPath);
+
+			//Updating 'share' table
+			$builder = $this->connection->getQueryBuilder();
+			$builder->update('share')
+				->set('last_updater', $builder->createNamedParameter(\OC_User::getUser(), IQueryBuilder::PARAM_STR))
+				->where($builder->expr()->eq('item_source', $builder->createNamedParameter($fileidShare, IQueryBuilder::PARAM_INT)));
+			$builder->execute();
+		}else syslog(LOG_INFO, "Not found for: " . $internalPath);
+
+		$builder = $this->connection->getQueryBuilder();
 		$builder->update('filecache')
 			->set('mtime', $builder->func()->greatest('mtime', $builder->createNamedParameter((int)$time, IQueryBuilder::PARAM_INT)))
 			->set('etag', $builder->createNamedParameter($etag, IQueryBuilder::PARAM_STR))
@@ -110,7 +133,7 @@ class Propagator implements IPropagator {
 				->andWhere($builder->expr()->gt('size', $builder->expr()->literal(-1, IQueryBuilder::PARAM_INT)));
 
 			$builder->execute();
-		}
+		}		
 	}
 
 	protected function getParents($path) {

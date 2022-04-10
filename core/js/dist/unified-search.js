@@ -15998,6 +15998,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -16058,7 +16070,8 @@ var REQUEST_CANCELED = 2;
           month: "",
           day: "",
           year: ""
-        }
+        },
+        last_updater: ""
       },
       focused: null,
       defaultLimit: _services_UnifiedSearchService__WEBPACK_IMPORTED_MODULE_1__["defaultLimit"],
@@ -16333,7 +16346,8 @@ var REQUEST_CANCELED = 2;
           month: "",
           day: "",
           year: ""
-        }
+        },
+        last_updater: ""
       };
       this.resetState();
       this.focusInput();
@@ -16444,12 +16458,16 @@ var REQUEST_CANCELED = 2;
         resultArray.push("mimetype::" + this.queryObject.mimetype);
       }
 
-      if (this.queryObject.owner !== "") {
+      if (this.queryObject.owner !== "" && !this.queryObject.owner.includes("__") && !this.queryObject.owner.includes("::")) {
         resultArray.push("owner::" + this.queryObject.owner);
       }
 
       if (this.queryObject.date.month !== "" && this.queryObject.date.day !== "" && this.queryObject.date.year !== "") {
         resultArray.push("date::" + this.queryObject.date.month.toString() + "::" + this.queryObject.date.day.toString() + "::" + this.queryObject.date.year.toString());
+      }
+
+      if (this.queryObject.last_updater !== "" && !this.queryObject.last_updater.includes("__") && !this.queryObject.last_updater.includes("::")) {
+        resultArray.push("last_updater::" + this.queryObject.last_updater);
       }
 
       return resultArray.join("__");
@@ -38147,6 +38165,56 @@ var render = function() {
                   ],
                   2
                 )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "unified-search__form-lastupdater" }, [
+                _c("label", { attrs: { for: "lastupdater" } }, [
+                  _vm._v("Last editor of file")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.last_updater,
+                      expression: "queryObject.last_updater"
+                    }
+                  ],
+                  staticClass: "unified-search__form-owner-lastupdater",
+                  attrs: {
+                    id: "lastupdater",
+                    value: "",
+                    placeholder: "Last editor of file"
+                  },
+                  domProps: { value: _vm.queryObject.last_updater },
+                  on: {
+                    input: [
+                      function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.queryObject,
+                          "last_updater",
+                          $event.target.value
+                        )
+                      },
+                      _vm.onInputDebounced
+                    ],
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    }
+                  }
+                })
               ]),
               _vm._v(" "),
               !!_vm.queryObject && !_vm.isLoading

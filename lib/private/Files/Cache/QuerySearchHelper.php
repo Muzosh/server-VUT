@@ -110,7 +110,6 @@ class QuerySearchHelper {
 		$builder = $this->getQueryBuilder();
 
 		$query = $builder->selectFileCache('file');
-
 		if ($this->searchBuilder->shouldJoinTags($searchQuery->getSearchOperation())) {
 			$user = $searchQuery->getUser();
 			if ($user === null) {
@@ -125,14 +124,12 @@ class QuerySearchHelper {
 				->andWhere($builder->expr()->eq('tag.type', $builder->createNamedParameter('files')))
 				->andWhere($builder->expr()->eq('tag.uid', $builder->createNamedParameter($user->getUID())));
 		}
-
 		$storageFilters = array_values(array_map(function (ICache $cache) {
 			return $cache->getQueryFilterForStorage();
 		}, $caches));
 		$storageFilter = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $storageFilters);
 		$filter = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_AND, [$searchQuery->getSearchOperation(), $storageFilter]);
 		$this->queryOptimizer->processOperator($filter);
-
 		$searchExpr = $this->searchBuilder->searchOperatorToDBExpr($builder, $filter);
 		if ($searchExpr) {
 			$query->andWhere($searchExpr);

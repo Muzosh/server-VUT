@@ -164,6 +164,18 @@
 					</select>
 				</div>
 
+				<div class="unified-search__form-lastupdater">
+					<label for="lastupdater">Last editor of file</label>
+					<input
+						v-model="queryObject.last_updater"
+						class="unified-search__form-owner-lastupdater"
+						id="lastupdater"
+						value=""
+						placeholder="Last editor of file"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+				</div>
+
 				<!-- Reset search button -->
 				<input v-if="!!queryObject && !isLoading"
 					type="reset"
@@ -306,7 +318,8 @@ export default {
 								month: "",
 								day: "",
 								year: ""
-							}
+							},
+							last_updater: ""
 						},
 			focused: null,
 			defaultLimit,
@@ -523,7 +536,8 @@ export default {
 									month: "",
 									day: "",
 									year: ""
-								}
+								},
+								last_updater: ""
 							}
 			this.resetState()
 			this.focusInput()
@@ -583,18 +597,22 @@ export default {
 				resultArray[0] = this.queryObject.name
 			}
 			if(this.queryObject.size.sizeMoreThan.size !== ""){
-				resultArray.push("gte::" + this.queryObject.size.sizeMoreThan.size.toString() + "::" + this.queryObject.size.sizeMoreThan.unit.toString())
+				resultArray.push("gte::" + this.queryObject.size.sizeMoreThan.size.toString() + "::" +
+				this.queryObject.size.sizeMoreThan.unit.toString())
 			}
 
 			if(this.queryObject.size.sizeLessThan.size !== ""){
-				resultArray.push("lte::" + this.queryObject.size.sizeLessThan.size.toString() + "::" + this.queryObject.size.sizeLessThan.unit.toString())
+				resultArray.push("lte::" + this.queryObject.size.sizeLessThan.size.toString() + "::" + 
+				this.queryObject.size.sizeLessThan.unit.toString())
 			}
 
 			if(this.queryObject.mimetype !== ""){
 				resultArray.push("mimetype::" + this.queryObject.mimetype)
 			}
 
-			if(this.queryObject.owner !== ""){
+			if(this.queryObject.owner !== "" &&
+				!this.queryObject.owner.includes("__") && 
+				!this.queryObject.owner.includes("::")){
 				resultArray.push("owner::" + this.queryObject.owner)
 			}
 
@@ -603,6 +621,12 @@ export default {
 									this.queryObject.date.month.toString() + "::" + 
 									this.queryObject.date.day.toString() + "::" +
 									this.queryObject.date.year.toString())
+			}
+
+			if(this.queryObject.last_updater !== "" && 
+				!this.queryObject.last_updater.includes("__") && 
+				!this.queryObject.last_updater.includes("::")){
+				resultArray.push("last_updater::" + this.queryObject.last_updater)
 			}
 
 			return resultArray.join("__")

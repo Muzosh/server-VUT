@@ -132,7 +132,7 @@ class DefaultShareProvider implements IShareProvider {
 	 */
 	public function create(\OCP\Share\IShare $share) {
 		$qb = $this->dbConn->getQueryBuilder();
-
+		syslog(LOG_INFO, "DEFUALT PROVIDER");
 		$qb->insert('share');
 		$qb->setValue('share_type', $qb->createNamedParameter($share->getShareType()));
 
@@ -199,6 +199,9 @@ class DefaultShareProvider implements IShareProvider {
 		// Set who is the owner of this file/folder (and this the owner of the share)
 		$qb->setValue('uid_owner', $qb->createNamedParameter($share->getShareOwner()));
 
+		// Set who is the latest editor of the file. At the beginning it should alwazs be the owner.
+		$qb->setValue('last_updater', $qb->createNamedParameter($share->getShareOwner()));
+
 		// Set the file target
 		$qb->setValue('file_target', $qb->createNamedParameter($share->getTarget()));
 
@@ -260,6 +263,7 @@ class DefaultShareProvider implements IShareProvider {
 				->set('expiration', $qb->createNamedParameter($share->getExpirationDate(), IQueryBuilder::PARAM_DATE))
 				->set('note', $qb->createNamedParameter($share->getNote()))
 				->set('accepted', $qb->createNamedParameter($share->getStatus()))
+				->set('last_updater', $qb->createNamedParameter(\OC_User::getUser()))
 				->execute();
 		} elseif ($share->getShareType() === IShare::TYPE_GROUP) {
 			$qb = $this->dbConn->getQueryBuilder();

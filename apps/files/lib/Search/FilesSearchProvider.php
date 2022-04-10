@@ -104,7 +104,7 @@ class FilesSearchProvider implements IProvider {
 	 */
 	public function search(IUser $user, ISearchQuery $query): SearchResult {
 		//Handling of file filters
-		syslog(LOG_INFO, "____");
+		//Definition of data structure with size units.
 		$UNITS = array(
 			"B" => 1,
 			"KB" => 1000,
@@ -113,9 +113,20 @@ class FilesSearchProvider implements IProvider {
 			"TB" => 1000000000000,
 		);
 
+		//Requests are always structured to be in a format ${FILE_NAME}__${FILTER_CRITERIA1}::${FILTER_VALUE1}::${FILTER_VALUE1}__${FILTER_CRITERIA1}::${FILTER_VALUE3}
+		//File name variable is fixed and doesn't carry a label due to compatibility.
+		//All other criteria are dynamic and each criteria has n values.
+
+		//$stringQueryList carries all criteria queries.
 		$stringQueryList = explode("__", $query->getTerm());
+
+		//$queryArray carries SQL sub-queries for different criteria in SearchComparison form.
 		$queryArray = [];
+
+		//Query created for File name criteria.
 		array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . array_shift($stringQueryList) . '%'));
+
+		///Limit search to opened folder. If the user isn't located in Files app, search all.
 		if(array_key_exists("fileid", $query->getRouteParameters())){
 			$queryCompare = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, [
 				new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]),
@@ -123,17 +134,24 @@ class FilesSearchProvider implements IProvider {
 			]);
 			array_push($queryArray, $queryCompare);
 		}
+
+		//Filters out empty values
 		$filteredStringQuery = array_filter($stringQueryList, function(string $stringQuery){
 			return strlen($stringQuery);
 		});
 
+		//Creates an SQL sub-query for every criteria.
 		foreach($filteredStringQuery as $stringQueryFiltered){
+
+			//$exploded has always the crieteria name on index 0 and its values on indexes larger or equal to 1.
 			$exploded = explode("::", $stringQueryFiltered);
 			if(count($exploded) >= 2){
 				switch($exploded[0]){
 					case "mimetype":
 						switch($exploded[1]){
 							case "text":
+
+								//Text mimetype is extended to PDFs, MS Word and Open Office documents.
 								$provisionalQueryArray = [
 														new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'text/%'),
 														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/pdf'),
@@ -143,10 +161,13 @@ class FilesSearchProvider implements IProvider {
 								$provisionalQuery = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $provisionalQueryArray);
 								break;
 							case "disk_image":
-								$provisionalQuery = new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'application/%');
-								array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', '%-disk-image'));
+
+								//Definition of Disc image is '%disk-image'.
+								$provisionalQuery = new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', '%disk-image');
 								break;
 							default:
+								
+								//Every other supported mimetype doesn't have a special definition.
 								$provisionalQuery = new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', $exploded[1] . '/%');
 						}
 						array_push($queryArray, $provisionalQuery);
@@ -155,34 +176,33 @@ class FilesSearchProvider implements IProvider {
 						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'owner', '%' . $exploded[1] . '%'));
 						break;
 					case "lte":
+
+						//
 						if(count($exploded) >= 3){
-							syslog(LOG_INFO, "LTE");
-							//array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'path', 'files%'));
 							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LESS_THAN_EQUAL, 'size', (int)$exploded[1] * $UNITS[$exploded[2]]));
 						}
 						break;
 					case "gte":
 						if(count($exploded) >= 3){
-							syslog(LOG_INFO, "GTE");
-							//array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'path', 'files%'));
 							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_GREATER_THAN_EQUAL, 'size', (int)$exploded[1] * $UNITS[$exploded[2]]));
 						}
 						break;
 					case "date":
 						if(count($exploded) >= 4){
-						syslog(LOG_INFO, /*(string)strtotime(*/$exploded[2] . " " . $exploded[1] . " " . $exploded[3]/*)*/);
+						syslog(LOG_INFO, $exploded[2] . " " . $exploded[1] . " " . $exploded[3]/*)*/);
 							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_GREATER_THAN_EQUAL, 'mtime', strtotime($exploded[2] . " " . $exploded[1] . " " . $exploded[3])));
 							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LESS_THAN, 'mtime', 86400 + strtotime($exploded[2] . " " . $exploded[1] . " " . $exploded[3])));
 						}
+					case "last_updater":
+						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'last_updater', '%' . $exploded[1] . '%'));
 						break;
 				}
 			}
 		}
-		syslog(LOG_INFO, (string)$query->getLimit());
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		$fileQuery = new SearchQuery(
 			new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_AND, $queryArray),
-			/*$query->getLimit()*/ 999,
+			array_key_exists("fileid", $query->getRouteParameters()) ? 999 : $query->getLimit(),
 			(int)$query->getCursor(),
 			$query->getSortOrder() === ISearchQuery::SORT_DATE_DESC ? [
 				new SearchOrder(ISearchOrder::DIRECTION_DESCENDING, 'mtime'),

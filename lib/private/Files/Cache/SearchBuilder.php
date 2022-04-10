@@ -102,7 +102,6 @@ class SearchBuilder {
 			if (count($operator->getArguments()) === 0) {
 				return null;
 			}
-
 			switch ($operator->getType()) {
 				case ISearchBinaryOperator::OPERATOR_NOT:
 					$negativeOperator = $operator->getArguments()[0];
@@ -177,6 +176,9 @@ class SearchBuilder {
 		elseif($field === 'parent'){
 			$field = 'file.parent';
 		}
+		elseif($field === 'last_updater'){
+			$field = 'sh.last_updater';
+		}
 		return [$field, $value, $type];
 	}
 
@@ -193,6 +195,7 @@ class SearchBuilder {
 			'storage' => 'integer',
 			'owner' => 'string',
 			'parent' => 'integer',
+			'last_updater' => 'string'
 		];
 		$comparisons = [
 			'mimetype' => ['eq', 'like'],
@@ -205,7 +208,8 @@ class SearchBuilder {
 			'fileid' => ['eq'],
 			'storage' => ['eq'],
 			'owner' => ['eq', 'like'],
-			'parent' => ['eq']
+			'parent' => ['eq'],
+			'last_updater' => ['eq', 'like']
 		];
 
 		if (!isset($types[$operator->getField()])) {

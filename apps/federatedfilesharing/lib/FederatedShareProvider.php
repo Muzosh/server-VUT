@@ -397,7 +397,8 @@ class FederatedShareProvider implements IShareProvider {
 			->setValue('permissions', $qb->createNamedParameter($permissions))
 			->setValue('expiration', $qb->createNamedParameter($expirationDate, IQueryBuilder::PARAM_DATE))
 			->setValue('token', $qb->createNamedParameter($token))
-			->setValue('stime', $qb->createNamedParameter(time()));
+			->setValue('stime', $qb->createNamedParameter(time()))
+			->setValue('last_updater', $qb->createNamedParameter($uidOwner));
 
 		/*
 		 * Added to fix https://github.com/owncloud/core/issues/22215
