@@ -398,6 +398,8 @@ class FederatedShareProvider implements IShareProvider {
 			->setValue('expiration', $qb->createNamedParameter($expirationDate, IQueryBuilder::PARAM_DATE))
 			->setValue('token', $qb->createNamedParameter($token))
 			->setValue('stime', $qb->createNamedParameter(time()))
+
+			//Last updater defined while adding a share row to DB
 			->setValue('last_updater', $qb->createNamedParameter($uidOwner));
 
 		/*

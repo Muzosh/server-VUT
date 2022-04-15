@@ -382,9 +382,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             _iterator.f();
           }
 
-          fileList.setFilter(resultArray
-          /*, cursor*/
-          );
+          fileList.setFilter(resultArray);
         } else fileList.setFilter([]);
       });
       Object(_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_0__["subscribe"])('nextcloud:unified-search.reset', function () {

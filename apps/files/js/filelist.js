@@ -3360,7 +3360,6 @@
 			if (this._filter === filter) {
 				return;
 			}
-			console.log("FILTERING");
 
 			this._filter = filter;
 			this.fileSummary.setFilter(filter, this.files);
@@ -3370,26 +3369,18 @@
 			}
 
 			var visibleCount = 0;
-			/*for(var individualFilter of filter){
-				individualFilter = individualFilter.toLowerCase();
-			}*/
 
 			function filterRows(tr) {
 				var $e = $(tr);
 				for(var individualFilter of filter){
-					//console.log("Setting: " + individualFilter);
-					//console.log("Considered: " + individualFilter);
 					if ($e.data('file').toString().indexOf(individualFilter) !== -1) {
-						//console.log("Shown: " + individualFilter);
 						visibleCount++;
 						$e.removeClass('hidden');
 					}
 				}
 			}
 
-			//if(filter.length > 0 && filter[0] !== ''){
 				var $trs = this.$fileList.find('tr');
-				//console.log("HIDING");
 				$($trs).addClass('hidden');
 				do {
 					_.each($trs, filterRows);
@@ -3397,7 +3388,6 @@
 						$trs = this._nextPage(false);
 					}
 				} while (visibleCount < total && $trs.length > 0);
-			//}
 
 			this.$container.trigger('scroll');
 		},

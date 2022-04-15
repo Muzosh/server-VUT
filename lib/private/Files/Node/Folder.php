@@ -271,7 +271,7 @@ class Folder extends Node implements \OCP\Files\Folder {
 
 		/** @var QuerySearchHelper $searchHelper */
 		$searchHelper = \OC::$server->get(QuerySearchHelper::class);
-		$resultsPerCache = $searchHelper->searchInCaches($query, $caches); //HERE
+		$resultsPerCache = $searchHelper->searchInCaches($query, $caches);
 
 		// loop trough all results per-cache, constructing the FileInfo object from the CacheEntry and merge them all
 		$files = array_merge(...array_map(function (array $results, $relativeMountPoint) use ($mountByMountPoint) {

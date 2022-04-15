@@ -147,10 +147,11 @@ class FilesSearchProvider implements IProvider {
 			$exploded = explode("::", $stringQueryFiltered);
 			if(count($exploded) >= 2){
 				switch($exploded[0]){
+					//TUTORIAL
+					//Here add a case to switch defining how to handle the criteria.
 					case "mimetype":
 						switch($exploded[1]){
 							case "text":
-
 								//Text mimetype is extended to PDFs, MS Word and Open Office documents.
 								$provisionalQueryArray = [
 														new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'text/%'),
@@ -161,12 +162,16 @@ class FilesSearchProvider implements IProvider {
 								$provisionalQuery = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $provisionalQueryArray);
 								break;
 							case "disk_image":
-
-								//Definition of Disc image is '%disk-image'.
-								$provisionalQuery = new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', '%disk-image');
-								break;
-							default:
+								//Should work for .iso, .vdi, .bin, .deb, .rpm, .adi., .dim and .ova
+								$provisionalQueryArray = [
+														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/octet-stream'),
+														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-bin'),
+														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-deb'),
+													];
 								
+								$provisionalQuery = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $provisionalQueryArray);
+								break;
+							default:	
 								//Every other supported mimetype doesn't have a special definition.
 								$provisionalQuery = new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', $exploded[1] . '/%');
 						}
@@ -176,24 +181,31 @@ class FilesSearchProvider implements IProvider {
 						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'owner', '%' . $exploded[1] . '%'));
 						break;
 					case "lte":
-
-						//
+						//Query for search for files of smaller size than provided.
 						if(count($exploded) >= 3){
 							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LESS_THAN_EQUAL, 'size', (int)$exploded[1] * $UNITS[$exploded[2]]));
 						}
 						break;
 					case "gte":
+						//Query for search for files of larger size than provided.
 						if(count($exploded) >= 3){
 							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_GREATER_THAN_EQUAL, 'size', (int)$exploded[1] * $UNITS[$exploded[2]]));
 						}
 						break;
-					case "date":
+					case "date_from":
+						//Query that selects all files last edited after the date.
 						if(count($exploded) >= 4){
-						syslog(LOG_INFO, $exploded[2] . " " . $exploded[1] . " " . $exploded[3]/*)*/);
 							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_GREATER_THAN_EQUAL, 'mtime', strtotime($exploded[2] . " " . $exploded[1] . " " . $exploded[3])));
+						}
+						break;
+					case "date_to":
+						//Query that selects all files last edited before the date included (86400).
+						if(count($exploded) >= 4){
 							array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LESS_THAN, 'mtime', 86400 + strtotime($exploded[2] . " " . $exploded[1] . " " . $exploded[3])));
 						}
+						break;
 					case "last_updater":
+						//Last updater = user ID of the person who made the last edit in a file.
 						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'last_updater', '%' . $exploded[1] . '%'));
 						break;
 				}
@@ -201,7 +213,11 @@ class FilesSearchProvider implements IProvider {
 		}
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		$fileQuery = new SearchQuery(
+			//Create a long query from the SQL sub-queries created earlier joined with AND operator.
 			new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_AND, $queryArray),
+			
+			//Define maximum number of provided results. Used for pagination.
+			//Pagination is effectively deactivated (set to 999) for Files app. Other apps have globally defined limit.
 			array_key_exists("fileid", $query->getRouteParameters()) ? 999 : $query->getLimit(),
 			(int)$query->getCursor(),
 			$query->getSortOrder() === ISearchQuery::SORT_DATE_DESC ? [

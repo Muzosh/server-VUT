@@ -32,7 +32,7 @@ import { subscribe } from '@nextcloud/event-bus'
 				  for(const data of query[0].list){
 					resultArray.push(data.title);
 				  }
-				  fileList.setFilter(resultArray/*, cursor*/);
+				  fileList.setFilter(resultArray);
 				}else fileList.setFilter([]);
 			})
 			subscribe('nextcloud:unified-search.reset', () => {

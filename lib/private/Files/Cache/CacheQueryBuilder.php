@@ -47,6 +47,9 @@ class CacheQueryBuilder extends QueryBuilder {
 			'storage_mtime', 'encrypted', 'etag', "$name.permissions", 'checksum', 'metadata_etag', 'creation_time', 'upload_time')
 			->from('filecache', $name)
 			->leftJoin($name, 'filecache_extended', 'fe', $this->expr()->eq("$name.fileid", 'fe.fileid'))
+
+			//TUTORIAL
+			//Add constraints here like the ->leftJoin() expansion.
 			->leftJoin($name, 'share', 'sh', $this->expr()->eq("$name.fileid", 'sh.file_source'));
 
 		$this->alias = $name;

@@ -143,9 +143,7 @@ class QuerySearchHelper {
 		if ($searchQuery->getOffset()) {
 			$query->setFirstResult($searchQuery->getOffset());
 		}
-		syslog(LOG_INFO, "preEXECUTED");
 		$result = $query->execute();
-		syslog(LOG_INFO, "EXECUTED");
 		$files = $result->fetchAll();
 
 		$rawEntries = array_map(function (array $data) {

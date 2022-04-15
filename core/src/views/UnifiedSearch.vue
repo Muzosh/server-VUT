@@ -67,7 +67,7 @@
 						<option value="image">Images</option>
 						<option value="video">Video</option>
 						<option value="audio">Audio</option>
-						<option value="disk_image">Disk image</option>
+						<option value="disk_image">Disk and Computer image</option>
 						<option value="">None</option>
 					</select>
 				</div>
@@ -134,29 +134,59 @@
 						@keypress.enter.prevent.stop="onInputEnter">
 				</div>
 				
-				<!--Last edit date-->
-				<div class="unified-search__form-date">
-					<label for="date-month">Last edit</label>
+				<!--Last edit date - from-->
+				<div class="unified-search__form-date-from">
+					<label for="date-month-from">From </label>
 					<select
-						v-model="queryObject.date.month"
+						v-model="queryObject.dateFrom.month"
 						class="unified-search__form-date-month"
-						id="date-month"
+						id="date-month-from"
 						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Month</option>
 						<option v-for="month in getMonthsArray">{{ month }}</option>
 					</select>
 					<select
-						v-model="queryObject.date.day"
-						class="unified-search__form-date-day"
+						v-model="queryObject.dateFrom.day"
+						class="unified-search__form-date-day-from"
 						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Day</option>
 						<option v-for="day in getDayArray">{{ day }}</option>
 					</select>
 					<select
-						v-model="queryObject.date.year"
-						class="unified-search__form-date-year"
+						v-model="queryObject.dateFrom.year"
+						class="unified-search__form-date-year-from"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option disabled value="">Year</option>
+						<option v-for="year in getYearArray">{{ year }}</option>
+					</select>
+				</div>
+
+				<!--Last edit date - to-->
+				<div class="unified-search__form-date-to">
+					<label for="date-month-to">To</label>
+					<select
+						v-model="queryObject.dateTo.month"
+						class="unified-search__form-date-month-to"
+						id="date-month-to"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option disabled value="">Month</option>
+						<option v-for="month in getMonthsArray">{{ month }}</option>
+					</select>
+					<select
+						v-model="queryObject.dateTo.day"
+						class="unified-search__form-date-day-to"
+						@input="onInputDebounced"
+						@keypress.enter.prevent.stop="onInputEnter">
+						<option disabled value="">Day</option>
+						<option v-for="day in getDayArray">{{ day }}</option>
+					</select>
+					<select
+						v-model="queryObject.dateTo.year"
+						class="unified-search__form-date-year-to"
 						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Year</option>
@@ -314,7 +344,12 @@ export default {
 								},
 							},
 							owner: "",
-							date: {
+							dateFrom: {
+								month: "",
+								day: "",
+								year: ""
+							},
+							dateTo: {
 								month: "",
 								day: "",
 								year: ""
@@ -532,7 +567,12 @@ export default {
 									},
 								},
 								owner: "",
-								date: {
+								dateFrom: {
+									month: "",
+									day: "",
+									year: ""
+								},
+								dateTo: {
 									month: "",
 									day: "",
 									year: ""
@@ -616,11 +656,18 @@ export default {
 				resultArray.push("owner::" + this.queryObject.owner)
 			}
 
-			if(this.queryObject.date.month !== "" && this.queryObject.date.day !== "" && this.queryObject.date.year !== ""){
-				resultArray.push("date::" + 
-									this.queryObject.date.month.toString() + "::" + 
-									this.queryObject.date.day.toString() + "::" +
-									this.queryObject.date.year.toString())
+			if(this.queryObject.dateFrom.month !== "" && this.queryObject.dateFrom.day !== "" && this.queryObject.dateFrom.year !== ""){
+				resultArray.push("date_from::" + 
+									this.queryObject.dateFrom.month.toString() + "::" + 
+									this.queryObject.dateFrom.day.toString() + "::" +
+									this.queryObject.dateFrom.year.toString())
+			}
+
+			if(this.queryObject.dateTo.month !== "" && this.queryObject.dateTo.day !== "" && this.queryObject.dateTo.year !== ""){
+				resultArray.push("date_to::" + 
+									this.queryObject.dateTo.month.toString() + "::" + 
+									this.queryObject.dateTo.day.toString() + "::" +
+									this.queryObject.dateTo.year.toString())
 			}
 
 			if(this.queryObject.last_updater !== "" && 

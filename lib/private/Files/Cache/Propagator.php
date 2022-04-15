@@ -99,9 +99,9 @@ class Propagator implements IPropagator {
 			->where($builder->expr()->eq('storage', $builder->createNamedParameter($storageId, IQueryBuilder::PARAM_INT)))
 			->where($builder->expr()->eq('path_hash', $builder->createNamedParameter(md5($internalPath), IQueryBuilder::PARAM_STR)));
 		$result = $builder->execute()->fetch();
+		
 		if($result){
 			$fileidShare = $result["fileid"];
-			syslog(LOG_INFO, "FileID: ". $fileidShare . ", Internal path: " . $internalPath);
 
 			//Updating 'share' table
 			$builder = $this->connection->getQueryBuilder();

@@ -159,6 +159,9 @@ class SearchBuilder {
 					$type = ISearchComparison::COMPARE_EQUAL;
 				}
 			}
+		//TUTORIAL
+		//Here you need to add the real name of the alias to be used in ISearchComparison type objects.
+		//Just add another elseif.
 		} elseif ($field === 'favorite') {
 			$field = 'tag.category';
 			$value = self::TAG_FAVORITE;
@@ -183,6 +186,9 @@ class SearchBuilder {
 	}
 
 	private function validateComparison(ISearchComparison $operator) {
+
+		//TUTORIAL
+		//Add type for the alias
 		$types = [
 			'mimetype' => 'string',
 			'mtime' => 'integer',
@@ -197,6 +203,9 @@ class SearchBuilder {
 			'parent' => 'integer',
 			'last_updater' => 'string'
 		];
+
+		//TUTORIAL
+		//Add supported operations for the alias.
 		$comparisons = [
 			'mimetype' => ['eq', 'like'],
 			'mtime' => ['eq', 'gt', 'lt', 'gte', 'lte'],

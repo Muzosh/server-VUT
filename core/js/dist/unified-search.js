@@ -16010,6 +16010,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -16066,7 +16096,12 @@ var REQUEST_CANCELED = 2;
           }
         },
         owner: "",
-        date: {
+        dateFrom: {
+          month: "",
+          day: "",
+          year: ""
+        },
+        dateTo: {
           month: "",
           day: "",
           year: ""
@@ -16342,7 +16377,12 @@ var REQUEST_CANCELED = 2;
           }
         },
         owner: "",
-        date: {
+        dateFrom: {
+          month: "",
+          day: "",
+          year: ""
+        },
+        dateTo: {
           month: "",
           day: "",
           year: ""
@@ -16462,8 +16502,12 @@ var REQUEST_CANCELED = 2;
         resultArray.push("owner::" + this.queryObject.owner);
       }
 
-      if (this.queryObject.date.month !== "" && this.queryObject.date.day !== "" && this.queryObject.date.year !== "") {
-        resultArray.push("date::" + this.queryObject.date.month.toString() + "::" + this.queryObject.date.day.toString() + "::" + this.queryObject.date.year.toString());
+      if (this.queryObject.dateFrom.month !== "" && this.queryObject.dateFrom.day !== "" && this.queryObject.dateFrom.year !== "") {
+        resultArray.push("date_from::" + this.queryObject.dateFrom.month.toString() + "::" + this.queryObject.dateFrom.day.toString() + "::" + this.queryObject.dateFrom.year.toString());
+      }
+
+      if (this.queryObject.dateTo.month !== "" && this.queryObject.dateTo.day !== "" && this.queryObject.dateTo.year !== "") {
+        resultArray.push("date_to::" + this.queryObject.dateTo.month.toString() + "::" + this.queryObject.dateTo.day.toString() + "::" + this.queryObject.dateTo.year.toString());
       }
 
       if (this.queryObject.last_updater !== "" && !this.queryObject.last_updater.includes("__") && !this.queryObject.last_updater.includes("::")) {
@@ -37684,7 +37728,7 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("option", { attrs: { value: "disk_image" } }, [
-                      _vm._v("Disk image")
+                      _vm._v("Disk and Computer image")
                     ]),
                     _vm._v(" "),
                     _c("option", { attrs: { value: "" } }, [_vm._v("None")])
@@ -37974,9 +38018,9 @@ var render = function() {
                 })
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "unified-search__form-date" }, [
-                _c("label", { attrs: { for: "date-month" } }, [
-                  _vm._v("Last edit")
+              _c("div", { staticClass: "unified-search__form-date-from" }, [
+                _c("label", { attrs: { for: "date-month-from" } }, [
+                  _vm._v("From ")
                 ]),
                 _vm._v(" "),
                 _c(
@@ -37986,12 +38030,12 @@ var render = function() {
                       {
                         name: "model",
                         rawName: "v-model",
-                        value: _vm.queryObject.date.month,
-                        expression: "queryObject.date.month"
+                        value: _vm.queryObject.dateFrom.month,
+                        expression: "queryObject.dateFrom.month"
                       }
                     ],
                     staticClass: "unified-search__form-date-month",
-                    attrs: { id: "date-month" },
+                    attrs: { id: "date-month-from" },
                     on: {
                       input: _vm.onInputDebounced,
                       keypress: function($event) {
@@ -38021,7 +38065,7 @@ var render = function() {
                             return val
                           })
                         _vm.$set(
-                          _vm.queryObject.date,
+                          _vm.queryObject.dateFrom,
                           "month",
                           $event.target.multiple
                             ? $$selectedVal
@@ -38049,11 +38093,11 @@ var render = function() {
                       {
                         name: "model",
                         rawName: "v-model",
-                        value: _vm.queryObject.date.day,
-                        expression: "queryObject.date.day"
+                        value: _vm.queryObject.dateFrom.day,
+                        expression: "queryObject.dateFrom.day"
                       }
                     ],
-                    staticClass: "unified-search__form-date-day",
+                    staticClass: "unified-search__form-date-day-from",
                     on: {
                       input: _vm.onInputDebounced,
                       keypress: function($event) {
@@ -38083,7 +38127,7 @@ var render = function() {
                             return val
                           })
                         _vm.$set(
-                          _vm.queryObject.date,
+                          _vm.queryObject.dateFrom,
                           "day",
                           $event.target.multiple
                             ? $$selectedVal
@@ -38111,11 +38155,11 @@ var render = function() {
                       {
                         name: "model",
                         rawName: "v-model",
-                        value: _vm.queryObject.date.year,
-                        expression: "queryObject.date.year"
+                        value: _vm.queryObject.dateFrom.year,
+                        expression: "queryObject.dateFrom.year"
                       }
                     ],
-                    staticClass: "unified-search__form-date-year",
+                    staticClass: "unified-search__form-date-year-from",
                     on: {
                       input: _vm.onInputDebounced,
                       keypress: function($event) {
@@ -38145,7 +38189,200 @@ var render = function() {
                             return val
                           })
                         _vm.$set(
-                          _vm.queryObject.date,
+                          _vm.queryObject.dateFrom,
+                          "year",
+                          $event.target.multiple
+                            ? $$selectedVal
+                            : $$selectedVal[0]
+                        )
+                      }
+                    }
+                  },
+                  [
+                    _c("option", { attrs: { disabled: "", value: "" } }, [
+                      _vm._v("Year")
+                    ]),
+                    _vm._v(" "),
+                    _vm._l(_vm.getYearArray, function(year) {
+                      return _c("option", [_vm._v(_vm._s(year))])
+                    })
+                  ],
+                  2
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "unified-search__form-date-to" }, [
+                _c("label", { attrs: { for: "date-month-to" } }, [
+                  _vm._v("To")
+                ]),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.queryObject.dateTo.month,
+                        expression: "queryObject.dateTo.month"
+                      }
+                    ],
+                    staticClass: "unified-search__form-date-month-to",
+                    attrs: { id: "date-month-to" },
+                    on: {
+                      input: _vm.onInputDebounced,
+                      keypress: function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
+                        }
+                        $event.preventDefault()
+                        $event.stopPropagation()
+                        return _vm.onInputEnter.apply(null, arguments)
+                      },
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.$set(
+                          _vm.queryObject.dateTo,
+                          "month",
+                          $event.target.multiple
+                            ? $$selectedVal
+                            : $$selectedVal[0]
+                        )
+                      }
+                    }
+                  },
+                  [
+                    _c("option", { attrs: { disabled: "", value: "" } }, [
+                      _vm._v("Month")
+                    ]),
+                    _vm._v(" "),
+                    _vm._l(_vm.getMonthsArray, function(month) {
+                      return _c("option", [_vm._v(_vm._s(month))])
+                    })
+                  ],
+                  2
+                ),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.queryObject.dateTo.day,
+                        expression: "queryObject.dateTo.day"
+                      }
+                    ],
+                    staticClass: "unified-search__form-date-day-to",
+                    on: {
+                      input: _vm.onInputDebounced,
+                      keypress: function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
+                        }
+                        $event.preventDefault()
+                        $event.stopPropagation()
+                        return _vm.onInputEnter.apply(null, arguments)
+                      },
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.$set(
+                          _vm.queryObject.dateTo,
+                          "day",
+                          $event.target.multiple
+                            ? $$selectedVal
+                            : $$selectedVal[0]
+                        )
+                      }
+                    }
+                  },
+                  [
+                    _c("option", { attrs: { disabled: "", value: "" } }, [
+                      _vm._v("Day")
+                    ]),
+                    _vm._v(" "),
+                    _vm._l(_vm.getDayArray, function(day) {
+                      return _c("option", [_vm._v(_vm._s(day))])
+                    })
+                  ],
+                  2
+                ),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.queryObject.dateTo.year,
+                        expression: "queryObject.dateTo.year"
+                      }
+                    ],
+                    staticClass: "unified-search__form-date-year-to",
+                    on: {
+                      input: _vm.onInputDebounced,
+                      keypress: function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
+                        }
+                        $event.preventDefault()
+                        $event.stopPropagation()
+                        return _vm.onInputEnter.apply(null, arguments)
+                      },
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.$set(
+                          _vm.queryObject.dateTo,
                           "year",
                           $event.target.multiple
                             ? $$selectedVal
