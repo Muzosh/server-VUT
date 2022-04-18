@@ -157,7 +157,7 @@ class FilesSearchProvider implements IProvider {
 														new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'text/%'),
 														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/pdf'),
 														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/msword'),
-														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/vnd.oasis.opendocument.text'),
 													];
 								$provisionalQuery = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $provisionalQueryArray);
 								break;
