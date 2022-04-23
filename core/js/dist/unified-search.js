@@ -16029,16 +16029,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -37626,15 +37616,6 @@ var render = function() {
                 },
                 domProps: { value: _vm.queryObject.name },
                 on: {
-                  input: [
-                    function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(_vm.queryObject, "name", $event.target.value)
-                    },
-                    _vm.onInputDebounced
-                  ],
                   keypress: function($event) {
                     if (
                       !$event.type.indexOf("key") &&
@@ -37645,6 +37626,12 @@ var render = function() {
                     $event.preventDefault()
                     $event.stopPropagation()
                     return _vm.onInputEnter.apply(null, arguments)
+                  },
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.queryObject, "name", $event.target.value)
                   }
                 }
               }),
@@ -37668,7 +37655,6 @@ var render = function() {
                     staticClass: "unified-search__form-mimetype-selector",
                     attrs: { id: "mimetype" },
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -37779,19 +37765,16 @@ var render = function() {
                         return _vm.onInputEnter.apply(null, arguments)
                       }
                     ],
-                    input: [
-                      function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(
-                          _vm.queryObject.size.sizeMoreThan,
-                          "size",
-                          $event.target.value
-                        )
-                      },
-                      _vm.onInputDebounced
-                    ]
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.queryObject.size.sizeMoreThan,
+                        "size",
+                        $event.target.value
+                      )
+                    }
                   }
                 }),
                 _vm._v(" "),
@@ -37808,7 +37791,6 @@ var render = function() {
                     ],
                     staticClass: "unified-search__form-morethan-unit-selector",
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -37899,19 +37881,16 @@ var render = function() {
                         return _vm.onInputEnter.apply(null, arguments)
                       }
                     ],
-                    input: [
-                      function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(
-                          _vm.queryObject.size.sizeLessThan,
-                          "size",
-                          $event.target.value
-                        )
-                      },
-                      _vm.onInputDebounced
-                    ]
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.queryObject.size.sizeLessThan,
+                        "size",
+                        $event.target.value
+                      )
+                    }
                   }
                 }),
                 _vm._v(" "),
@@ -37928,7 +37907,6 @@ var render = function() {
                     ],
                     staticClass: "unified-search__form-lessthan-unit",
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -37997,15 +37975,6 @@ var render = function() {
                   attrs: { id: "owner", value: "", placeholder: "File owner" },
                   domProps: { value: _vm.queryObject.owner },
                   on: {
-                    input: [
-                      function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(_vm.queryObject, "owner", $event.target.value)
-                      },
-                      _vm.onInputDebounced
-                    ],
                     keypress: function($event) {
                       if (
                         !$event.type.indexOf("key") &&
@@ -38016,6 +37985,12 @@ var render = function() {
                       $event.preventDefault()
                       $event.stopPropagation()
                       return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.queryObject, "owner", $event.target.value)
                     }
                   }
                 })
@@ -38040,7 +38015,6 @@ var render = function() {
                     staticClass: "unified-search__form-date-month",
                     attrs: { id: "date-month-from" },
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -38102,7 +38076,6 @@ var render = function() {
                     ],
                     staticClass: "unified-search__form-date-day-from",
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -38164,7 +38137,6 @@ var render = function() {
                     ],
                     staticClass: "unified-search__form-date-year-from",
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -38233,7 +38205,6 @@ var render = function() {
                     staticClass: "unified-search__form-date-month-to",
                     attrs: { id: "date-month-to" },
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -38295,7 +38266,6 @@ var render = function() {
                     ],
                     staticClass: "unified-search__form-date-day-to",
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -38357,7 +38327,6 @@ var render = function() {
                     ],
                     staticClass: "unified-search__form-date-year-to",
                     on: {
-                      input: _vm.onInputDebounced,
                       keypress: function($event) {
                         if (
                           !$event.type.indexOf("key") &&
@@ -38429,19 +38398,6 @@ var render = function() {
                   },
                   domProps: { value: _vm.queryObject.last_updater },
                   on: {
-                    input: [
-                      function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(
-                          _vm.queryObject,
-                          "last_updater",
-                          $event.target.value
-                        )
-                      },
-                      _vm.onInputDebounced
-                    ],
                     keypress: function($event) {
                       if (
                         !$event.type.indexOf("key") &&
@@ -38452,9 +38408,33 @@ var render = function() {
                       $event.preventDefault()
                       $event.stopPropagation()
                       return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.queryObject,
+                        "last_updater",
+                        $event.target.value
+                      )
                     }
                   }
                 })
+              ]),
+              _vm._v(" "),
+              _c("div", [
+                _c(
+                  "button",
+                  {
+                    on: {
+                      click: function($event) {
+                        return _vm.onInput()
+                      }
+                    }
+                  },
+                  [_vm._v("Submit")]
+                )
               ]),
               _vm._v(" "),
               !!_vm.queryObject && !_vm.isLoading

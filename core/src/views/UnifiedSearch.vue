@@ -49,7 +49,6 @@
 					value=""
 					:class="{'unified-search__form-input--with-reset': !!queryObject}"
 					:placeholder="t('core', 'Search {types} …', { types: typesNames.join(', ') })"
-					@input="onInputDebounced"
 					@keypress.enter.prevent.stop="onInputEnter">
 
 				<!-- Additional filters-->
@@ -60,7 +59,6 @@
 						v-model="queryObject.mimetype"
 						class="unified-search__form-mimetype-selector"
 						id="mimetype"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Media type</option>
 						<option value="text">Text</option>
@@ -83,12 +81,10 @@
 						value=""
 						placeholder="eg. 1000"
 						v-on:keypress="isNumber($event)"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 					<select
 						v-model="queryObject.size.sizeMoreThan.unit"
 						class="unified-search__form-morethan-unit-selector"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option>MB</option>
 						<option>B</option>
@@ -107,12 +103,10 @@
 						value=""
 						placeholder="eg. 1000"
 						v-on:keypress="isNumber($event)"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 					<select
 						v-model="queryObject.size.sizeLessThan.unit"
 						class="unified-search__form-lessthan-unit"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option>MB</option>
 						<option>B</option>
@@ -131,7 +125,6 @@
 						id="owner"
 						value=""
 						placeholder="File owner"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 				</div>
 				
@@ -142,7 +135,6 @@
 						v-model="queryObject.dateFrom.month"
 						class="unified-search__form-date-month"
 						id="date-month-from"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Month</option>
 						<option v-for="month in getMonthsArray">{{ month }}</option>
@@ -150,7 +142,6 @@
 					<select
 						v-model="queryObject.dateFrom.day"
 						class="unified-search__form-date-day-from"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Day</option>
 						<option v-for="day in getDayArray">{{ day }}</option>
@@ -158,7 +149,6 @@
 					<select
 						v-model="queryObject.dateFrom.year"
 						class="unified-search__form-date-year-from"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Year</option>
 						<option v-for="year in getYearArray">{{ year }}</option>
@@ -172,7 +162,6 @@
 						v-model="queryObject.dateTo.month"
 						class="unified-search__form-date-month-to"
 						id="date-month-to"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Month</option>
 						<option v-for="month in getMonthsArray">{{ month }}</option>
@@ -180,7 +169,6 @@
 					<select
 						v-model="queryObject.dateTo.day"
 						class="unified-search__form-date-day-to"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Day</option>
 						<option v-for="day in getDayArray">{{ day }}</option>
@@ -188,7 +176,6 @@
 					<select
 						v-model="queryObject.dateTo.year"
 						class="unified-search__form-date-year-to"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
 						<option disabled value="">Year</option>
 						<option v-for="year in getYearArray">{{ year }}</option>
@@ -203,8 +190,11 @@
 						id="lastupdater"
 						value=""
 						placeholder="Last editor of file"
-						@input="onInputDebounced"
 						@keypress.enter.prevent.stop="onInputEnter">
+				</div>
+
+				<div>
+					<button v-on:click="onInput()">Submit</button>
 				</div>
 
 				<!-- Reset search button -->
