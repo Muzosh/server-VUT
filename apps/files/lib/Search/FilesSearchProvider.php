@@ -152,23 +152,34 @@ class FilesSearchProvider implements IProvider {
 					case "mimetype":
 						switch($exploded[1]){
 							case "text":
-								//Text mimetype is extended to PDFs, MS Word and Open Office documents.
+								//Text mimetype is extended to PDFs, MS Word (.doc, .docx) and Open Office documents.
 								$provisionalQueryArray = [
-														new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'text/%'),
-														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/pdf'),
-														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/msword'),
-														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/vnd.oasis.opendocument.text'),
-													];
+									new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'text/%'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/pdf'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/msword'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/vnd.oasis.opendocument.text'),
+								];
 								$provisionalQuery = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $provisionalQueryArray);
 								break;
 							case "disk_image":
 								//Should work for .iso, .vdi, .bin, .deb, .rpm, .adi., .dim and .ova
 								$provisionalQueryArray = [
-														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/octet-stream'),
-														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-bin'),
-														new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-deb'),
-													];
-								
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-disk-image'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-bin'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-deb'),
+								];
+								$provisionalQuery = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $provisionalQueryArray);
+								break;
+							case "archive":
+								//Should work for .gz, .zip, .7z, .rar, .tar
+								$provisionalQueryArray = [
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/gzip'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/zip'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-7z-compressed'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/vnd.rar'),
+									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/x-tar'),
+								];
 								$provisionalQuery = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, $provisionalQueryArray);
 								break;
 							default:	

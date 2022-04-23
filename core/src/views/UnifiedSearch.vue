@@ -68,6 +68,7 @@
 						<option value="video">Video</option>
 						<option value="audio">Audio</option>
 						<option value="disk_image">Disk and Computer image</option>
+						<option value="archive">Compressed archive</option>
 						<option value="">None</option>
 					</select>
 				</div>
@@ -248,21 +249,20 @@
 		</template>
 
 		<!-- Grouped search results -->
-		<template v-else>
+		<!--<template v-else>
 			<ul v-for="({list, type}, typesIndex) in orderedResults"
 				:key="type"
 				class="unified-search__results"
 				:class="`unified-search__results-${type}`"
 				:aria-label="typesMap[type]">
-				<!-- Search results -->
+
+				Search results
 				<li v-for="(result, index) in limitIfAny(list, type)" :key="result.resourceUrl">
 					<SearchResult v-bind="result"
 						:queryObject="queryObject"
 						:focused="focused === 0 && typesIndex === 0 && index === 0"
 						@focus="setFocusedIndex" />
 				</li>
-
-				<!-- Load more button 
 				<li>
 					<SearchResult v-if="!reached[type] && "
 						class="unified-search__result-more"
@@ -273,9 +273,8 @@
 						@click.prevent="loadMore(type)"
 						@focus="setFocusedIndex" />
 				</li>
-				-->
 			</ul>
-		</template>
+		</template>-->
 	</HeaderMenu>
 </template>
 

@@ -16039,7 +16039,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
 
 
 
@@ -37731,6 +37730,10 @@ var render = function() {
                       _vm._v("Disk and Computer image")
                     ]),
                     _vm._v(" "),
+                    _c("option", { attrs: { value: "archive" } }, [
+                      _vm._v("Compressed archive")
+                    ]),
+                    _vm._v(" "),
                     _c("option", { attrs: { value: "" } }, [_vm._v("None")])
                   ]
                 )
@@ -38503,47 +38506,7 @@ var render = function() {
       _vm._v(" "),
       !_vm.hasResults
         ? [_vm.isLoading ? _c("SearchResultPlaceholders") : _vm._e()]
-        : _vm._l(_vm.orderedResults, function(ref, typesIndex) {
-            var list = ref.list
-            var type = ref.type
-            return _c(
-              "ul",
-              {
-                key: type,
-                staticClass: "unified-search__results",
-                class: "unified-search__results-" + type,
-                attrs: { "aria-label": _vm.typesMap[type] }
-              },
-              _vm._l(_vm.limitIfAny(list, type), function(result, index) {
-                return _c(
-                  "li",
-                  { key: result.resourceUrl },
-                  [
-                    _c(
-                      "SearchResult",
-                      _vm._b(
-                        {
-                          attrs: {
-                            queryObject: _vm.queryObject,
-                            focused:
-                              _vm.focused === 0 &&
-                              typesIndex === 0 &&
-                              index === 0
-                          },
-                          on: { focus: _vm.setFocusedIndex }
-                        },
-                        "SearchResult",
-                        result,
-                        false
-                      )
-                    )
-                  ],
-                  1
-                )
-              }),
-              0
-            )
-          })
+        : _vm._e()
     ],
     2
   )
