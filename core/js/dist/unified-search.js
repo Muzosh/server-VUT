@@ -16471,8 +16471,10 @@ var REQUEST_CANCELED = 2;
     stringifyQuery: function stringifyQuery() {
       var resultArray = [""];
 
-      if (!this.queryObject.name.includes("__")) {
+      if (!this.queryObject.name.includes("__") && this.queryObject.name.length > 1) {
         resultArray[0] = this.queryObject.name;
+      } else {
+        resultArray[0] = "";
       }
 
       if (this.queryObject.size.sizeMoreThan.size !== "") {
