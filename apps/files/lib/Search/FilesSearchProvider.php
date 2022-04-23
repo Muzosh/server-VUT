@@ -128,10 +128,7 @@ class FilesSearchProvider implements IProvider {
 
 		///Limit search to opened folder. If the user isn't located in Files app, search all.
 		if(array_key_exists("fileid", $query->getRouteParameters())){
-			$queryCompare = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, [
-				new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]),
-				new SearchComparison(ISearchComparison::COMPARE_LIKE, 'owner', "%%")
-			]);
+			$queryCompare = new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]);
 			array_push($queryArray, $queryCompare);
 		}
 
