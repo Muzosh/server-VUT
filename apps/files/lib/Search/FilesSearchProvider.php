@@ -132,9 +132,9 @@ class FilesSearchProvider implements IProvider {
 				new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]),
 				new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_AND, [
 					new SearchComparison(ISearchComparison::COMPARE_LIKE, 'owner', '%%'),
-					new SearchComparison(ISearchComparison::COMPARE_LIKE, 'file_target', (string)$query->getRouteParameters()["dir"] . '%'),
+					new SearchComparison(ISearchComparison::COMPARE_LIKE, 'file_target', (string)$query->getRouteParameters()["dir"] . '/%'),
 					new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_NOT, [
-						new SearchComparison(ISearchComparison::COMPARE_LIKE, 'file_target', (string)$query->getRouteParameters()["dir"] . '%/%'),
+						new SearchComparison(ISearchComparison::COMPARE_LIKE, 'file_target', (string)$query->getRouteParameters()["dir"] . '/%/%'),
 					])
 				])
 			]);
