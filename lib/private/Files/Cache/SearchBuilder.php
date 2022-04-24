@@ -182,6 +182,9 @@ class SearchBuilder {
 		elseif($field === 'last_updater'){
 			$field = 'sh.last_updater';
 		}
+		elseif($filed === 'file_target'){
+			$filed = 'sh.file_target';
+		}
 		return [$field, $value, $type];
 	}
 
@@ -201,7 +204,8 @@ class SearchBuilder {
 			'storage' => 'integer',
 			'owner' => 'string',
 			'parent' => 'integer',
-			'last_updater' => 'string'
+			'last_updater' => 'string',
+			'file_target' => 'string',
 		];
 
 		//TUTORIAL
@@ -218,7 +222,8 @@ class SearchBuilder {
 			'storage' => ['eq'],
 			'owner' => ['eq', 'like'],
 			'parent' => ['eq'],
-			'last_updater' => ['eq', 'like']
+			'last_updater' => ['eq', 'like'],
+			'file_target' => ['eq', 'like'],
 		];
 
 		if (!isset($types[$operator->getField()])) {

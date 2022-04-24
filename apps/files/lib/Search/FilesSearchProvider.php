@@ -127,8 +127,17 @@ class FilesSearchProvider implements IProvider {
 		array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'name', '%' . array_shift($stringQueryList) . '%'));
 
 		///Limit search to opened folder. If the user isn't located in Files app, search all.
-		if(array_key_exists("fileid", $query->getRouteParameters())){
-			$queryCompare = new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]);
+		if(array_key_exists("fileid", $query->getRouteParameters()) && array_key_exists("dir", $query->getRouteParameters())){
+			$queryCompare = new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_OR, [
+				new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'parent', (int)$query->getRouteParameters()["fileid"]),
+				new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_AND, [
+					new SearchComparison(ISearchComparison::COMPARE_LIKE, 'owner', '%%'),
+					new SearchComparison(ISearchComparison::COMPARE_LIKE, 'file_target', (string)$query->getRouteParameters()["dir"] . '%'),
+					new SearchBinaryOperator(ISearchBinaryOperator::OPERATOR_NOT, [
+						new SearchComparison(ISearchComparison::COMPARE_LIKE, 'file_target', (string)$query->getRouteParameters()["dir"] . '%/%'),
+					])
+				])
+			]);
 			array_push($queryArray, $queryCompare);
 		}
 
