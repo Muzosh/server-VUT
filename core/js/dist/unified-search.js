@@ -16471,8 +16471,9 @@ var REQUEST_CANCELED = 2;
     stringifyQuery: function stringifyQuery() {
       var resultArray = [""];
 
-      if (!this.queryObject.name.includes("__") && this.queryObject.name.length > 1) {
-        resultArray[0] = this.queryObject.name;
+      if (this.queryObject.name.length > 1 && !this.queryObject.name.endsWith('\\')) {
+        var nameString = this.queryObject.name;
+        resultArray[0] = nameString.replace('::', '\\:\\:').replace('__', '\\_\\_');
       } else {
         resultArray[0] = "";
       }
@@ -16489,8 +16490,9 @@ var REQUEST_CANCELED = 2;
         resultArray.push("mimetype::" + this.queryObject.mimetype);
       }
 
-      if (this.queryObject.owner !== "" && !this.queryObject.owner.includes("__") && !this.queryObject.owner.includes("::")) {
-        resultArray.push("owner::" + this.queryObject.owner);
+      if (this.queryObject.owner !== "" && !this.queryObject.owner.endsWith('\\') && !this.queryObject.owner.includes('__') && !this.queryObject.owner.includes('::')) {
+        var ownerString = this.queryObject.owner;
+        resultArray.push("owner::" + ownerString);
       }
 
       if (this.queryObject.dateFrom.month !== "" && this.queryObject.dateFrom.day !== "" && this.queryObject.dateFrom.year !== "") {
@@ -16501,11 +16503,12 @@ var REQUEST_CANCELED = 2;
         resultArray.push("date_to::" + this.queryObject.dateTo.month.toString() + "::" + this.queryObject.dateTo.day.toString() + "::" + this.queryObject.dateTo.year.toString());
       }
 
-      if (this.queryObject.last_updater !== "" && !this.queryObject.last_updater.includes("__") && !this.queryObject.last_updater.includes("::")) {
-        resultArray.push("last_updater::" + this.queryObject.last_updater);
+      if (this.queryObject.last_updater !== "" && !this.queryObject.last_updater.endsWith('\\') && !this.queryObject.last_updater.includes('__') && !this.queryObject.last_updater.includes('::')) {
+        var lastUpdaterOwner = this.queryObject.last_updater;
+        resultArray.push("last_updater::" + lastUpdaterOwner);
       }
 
-      return resultArray.join("__");
+      return resultArray.join("__").replace('in', '\\in');
     },
 
     /**
@@ -37571,52 +37574,374 @@ var render = function() {
     },
     [
       _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "unified-search__input-wrapper" },
-        [
-          _c(
-            "form",
-            {
-              staticClass: "unified-search__form",
-              class: { "icon-loading-small": _vm.isLoading },
-              attrs: { role: "search" },
+      _c("div", { staticClass: "unified-search__input-wrapper" }, [
+        _c(
+          "form",
+          {
+            staticClass: "unified-search__form",
+            class: { "icon-loading-small": _vm.isLoading },
+            attrs: { role: "search" },
+            on: {
+              submit: function($event) {
+                $event.preventDefault()
+                $event.stopPropagation()
+                return _vm.onInputEnter.apply(null, arguments)
+              },
+              reset: function($event) {
+                $event.preventDefault()
+                $event.stopPropagation()
+                return _vm.onReset.apply(null, arguments)
+              }
+            }
+          },
+          [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.queryObject.name,
+                  expression: "queryObject.name"
+                }
+              ],
+              ref: "input",
+              staticClass: "unified-search__form-input",
+              class: {
+                "unified-search__form-input--with-reset": !!_vm.queryObject
+              },
+              attrs: {
+                type: "search",
+                value: "",
+                placeholder: _vm.t("core", "Search {types} …", {
+                  types: _vm.typesNames.join(", ")
+                })
+              },
+              domProps: { value: _vm.queryObject.name },
               on: {
-                submit: function($event) {
+                keypress: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                  ) {
+                    return null
+                  }
                   $event.preventDefault()
                   $event.stopPropagation()
                   return _vm.onInputEnter.apply(null, arguments)
                 },
-                reset: function($event) {
-                  $event.preventDefault()
-                  $event.stopPropagation()
-                  return _vm.onReset.apply(null, arguments)
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.queryObject, "name", $event.target.value)
                 }
               }
-            },
-            [
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "unified-search__form-mimetype" }, [
+              _c("label", { attrs: { for: "morethan" } }, [
+                _vm._v("Type of media")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.mimetype,
+                      expression: "queryObject.mimetype"
+                    }
+                  ],
+                  staticClass: "unified-search__form-mimetype-selector",
+                  attrs: { id: "mimetype" },
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject,
+                        "mimetype",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { attrs: { disabled: "", value: "" } }, [
+                    _vm._v("Media type")
+                  ]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "text" } }, [_vm._v("Text")]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "image" } }, [
+                    _vm._v("Images")
+                  ]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "video" } }, [
+                    _vm._v("Video")
+                  ]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "audio" } }, [
+                    _vm._v("Audio")
+                  ]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "disk_image" } }, [
+                    _vm._v("Disk and Computer image")
+                  ]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "archive" } }, [
+                    _vm._v("Compressed archive")
+                  ]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "" } }, [_vm._v("None")])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "unified-search__form-morethan" }, [
+              _c("label", { attrs: { for: "morethan" } }, [
+                _vm._v("Size more than")
+              ]),
+              _vm._v(" "),
               _c("input", {
                 directives: [
                   {
                     name: "model",
                     rawName: "v-model",
-                    value: _vm.queryObject.name,
-                    expression: "queryObject.name"
+                    value: _vm.queryObject.size.sizeMoreThan.size,
+                    expression: "queryObject.size.sizeMoreThan.size"
                   }
                 ],
-                ref: "input",
-                staticClass: "unified-search__form-input",
-                class: {
-                  "unified-search__form-input--with-reset": !!_vm.queryObject
+                staticClass: "unified-search__form-morethan-selector",
+                attrs: { id: "morethan", value: "", placeholder: "eg. 1000" },
+                domProps: { value: _vm.queryObject.size.sizeMoreThan.size },
+                on: {
+                  keypress: [
+                    function($event) {
+                      return _vm.isNumber($event)
+                    },
+                    function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    }
+                  ],
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(
+                      _vm.queryObject.size.sizeMoreThan,
+                      "size",
+                      $event.target.value
+                    )
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.size.sizeMoreThan.unit,
+                      expression: "queryObject.size.sizeMoreThan.unit"
+                    }
+                  ],
+                  staticClass: "unified-search__form-morethan-unit-selector",
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject.size.sizeMoreThan,
+                        "unit",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
                 },
-                attrs: {
-                  type: "search",
-                  value: "",
-                  placeholder: _vm.t("core", "Search {types} …", {
-                    types: _vm.typesNames.join(", ")
-                  })
+                [
+                  _c("option", [_vm._v("MB")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("B")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("KB")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("GB")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("TB")])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "unified-search__form-lessthan" }, [
+              _c("label", { attrs: { for: "lessthan" } }, [
+                _vm._v("Size less than")
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.queryObject.size.sizeLessThan.size,
+                    expression: "queryObject.size.sizeLessThan.size"
+                  }
+                ],
+                staticClass: "unified-search__form-lessthan-selector",
+                attrs: { id: "lessthan", value: "", placeholder: "eg. 1000" },
+                domProps: { value: _vm.queryObject.size.sizeLessThan.size },
+                on: {
+                  keypress: [
+                    function($event) {
+                      return _vm.isNumber($event)
+                    },
+                    function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    }
+                  ],
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(
+                      _vm.queryObject.size.sizeLessThan,
+                      "size",
+                      $event.target.value
+                    )
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.size.sizeLessThan.unit,
+                      expression: "queryObject.size.sizeLessThan.unit"
+                    }
+                  ],
+                  staticClass: "unified-search__form-lessthan-unit",
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject.size.sizeLessThan,
+                        "unit",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
                 },
-                domProps: { value: _vm.queryObject.name },
+                [
+                  _c("option", [_vm._v("MB")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("B")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("KB")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("GB")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("TB")])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "unified-search__form-owner" }, [
+              _c("label", { attrs: { for: "owner" } }, [_vm._v("File owner")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.queryObject.owner,
+                    expression: "queryObject.owner"
+                  }
+                ],
+                staticClass: "unified-search__form-owner-selector",
+                attrs: { id: "owner", value: "", placeholder: "File owner" },
+                domProps: { value: _vm.queryObject.owner },
                 on: {
                   keypress: function($event) {
                     if (
@@ -37633,858 +37958,428 @@ var render = function() {
                     if ($event.target.composing) {
                       return
                     }
-                    _vm.$set(_vm.queryObject, "name", $event.target.value)
+                    _vm.$set(_vm.queryObject, "owner", $event.target.value)
                   }
                 }
-              }),
-              _vm._v(" "),
-              _c("div", { staticClass: "unified-search__form-mimetype" }, [
-                _c("label", { attrs: { for: "morethan" } }, [
-                  _vm._v("Type of media")
-                ]),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.mimetype,
-                        expression: "queryObject.mimetype"
-                      }
-                    ],
-                    staticClass: "unified-search__form-mimetype-selector",
-                    attrs: { id: "mimetype" },
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject,
-                          "mimetype",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { disabled: "", value: "" } }, [
-                      _vm._v("Media type")
-                    ]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "text" } }, [
-                      _vm._v("Text")
-                    ]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "image" } }, [
-                      _vm._v("Images")
-                    ]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "video" } }, [
-                      _vm._v("Video")
-                    ]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "audio" } }, [
-                      _vm._v("Audio")
-                    ]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "disk_image" } }, [
-                      _vm._v("Disk and Computer image")
-                    ]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "archive" } }, [
-                      _vm._v("Compressed archive")
-                    ]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "" } }, [_vm._v("None")])
-                  ]
-                )
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "unified-search__form-date-from" }, [
+              _c("label", { attrs: { for: "date-month-from" } }, [
+                _vm._v("From ")
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "unified-search__form-morethan" }, [
-                _c("label", { attrs: { for: "morethan" } }, [
-                  _vm._v("Size more than")
-                ]),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.queryObject.size.sizeMoreThan.size,
-                      expression: "queryObject.size.sizeMoreThan.size"
-                    }
-                  ],
-                  staticClass: "unified-search__form-morethan-selector",
-                  attrs: { id: "morethan", value: "", placeholder: "eg. 1000" },
-                  domProps: { value: _vm.queryObject.size.sizeMoreThan.size },
-                  on: {
-                    keypress: [
-                      function($event) {
-                        return _vm.isNumber($event)
-                      },
-                      function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      }
-                    ],
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(
-                        _vm.queryObject.size.sizeMoreThan,
-                        "size",
-                        $event.target.value
-                      )
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.size.sizeMoreThan.unit,
-                        expression: "queryObject.size.sizeMoreThan.unit"
-                      }
-                    ],
-                    staticClass: "unified-search__form-morethan-unit-selector",
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject.size.sizeMoreThan,
-                          "unit",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", [_vm._v("MB")]),
-                    _vm._v(" "),
-                    _c("option", [_vm._v("B")]),
-                    _vm._v(" "),
-                    _c("option", [_vm._v("KB")]),
-                    _vm._v(" "),
-                    _c("option", [_vm._v("GB")]),
-                    _vm._v(" "),
-                    _c("option", [_vm._v("TB")])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "unified-search__form-lessthan" }, [
-                _c("label", { attrs: { for: "lessthan" } }, [
-                  _vm._v("Size less than")
-                ]),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.queryObject.size.sizeLessThan.size,
-                      expression: "queryObject.size.sizeLessThan.size"
-                    }
-                  ],
-                  staticClass: "unified-search__form-lessthan-selector",
-                  attrs: { id: "lessthan", value: "", placeholder: "eg. 1000" },
-                  domProps: { value: _vm.queryObject.size.sizeLessThan.size },
-                  on: {
-                    keypress: [
-                      function($event) {
-                        return _vm.isNumber($event)
-                      },
-                      function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      }
-                    ],
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(
-                        _vm.queryObject.size.sizeLessThan,
-                        "size",
-                        $event.target.value
-                      )
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.size.sizeLessThan.unit,
-                        expression: "queryObject.size.sizeLessThan.unit"
-                      }
-                    ],
-                    staticClass: "unified-search__form-lessthan-unit",
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject.size.sizeLessThan,
-                          "unit",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", [_vm._v("MB")]),
-                    _vm._v(" "),
-                    _c("option", [_vm._v("B")]),
-                    _vm._v(" "),
-                    _c("option", [_vm._v("KB")]),
-                    _vm._v(" "),
-                    _c("option", [_vm._v("GB")]),
-                    _vm._v(" "),
-                    _c("option", [_vm._v("TB")])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "unified-search__form-owner" }, [
-                _c("label", { attrs: { for: "owner" } }, [
-                  _vm._v("File owner")
-                ]),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.queryObject.owner,
-                      expression: "queryObject.owner"
-                    }
-                  ],
-                  staticClass: "unified-search__form-owner-selector",
-                  attrs: { id: "owner", value: "", placeholder: "File owner" },
-                  domProps: { value: _vm.queryObject.owner },
-                  on: {
-                    keypress: function($event) {
-                      if (
-                        !$event.type.indexOf("key") &&
-                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                      ) {
-                        return null
-                      }
-                      $event.preventDefault()
-                      $event.stopPropagation()
-                      return _vm.onInputEnter.apply(null, arguments)
-                    },
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(_vm.queryObject, "owner", $event.target.value)
-                    }
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "unified-search__form-date-from" }, [
-                _c("label", { attrs: { for: "date-month-from" } }, [
-                  _vm._v("From ")
-                ]),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.dateFrom.month,
-                        expression: "queryObject.dateFrom.month"
-                      }
-                    ],
-                    staticClass: "unified-search__form-date-month",
-                    attrs: { id: "date-month-from" },
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject.dateFrom,
-                          "month",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { disabled: "", value: "" } }, [
-                      _vm._v("Month")
-                    ]),
-                    _vm._v(" "),
-                    _vm._l(_vm.getMonthsArray, function(month) {
-                      return _c("option", [_vm._v(_vm._s(month))])
-                    })
-                  ],
-                  2
-                ),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.dateFrom.day,
-                        expression: "queryObject.dateFrom.day"
-                      }
-                    ],
-                    staticClass: "unified-search__form-date-day-from",
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject.dateFrom,
-                          "day",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { disabled: "", value: "" } }, [
-                      _vm._v("Day")
-                    ]),
-                    _vm._v(" "),
-                    _vm._l(_vm.getDayArray, function(day) {
-                      return _c("option", [_vm._v(_vm._s(day))])
-                    })
-                  ],
-                  2
-                ),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.dateFrom.year,
-                        expression: "queryObject.dateFrom.year"
-                      }
-                    ],
-                    staticClass: "unified-search__form-date-year-from",
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject.dateFrom,
-                          "year",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { disabled: "", value: "" } }, [
-                      _vm._v("Year")
-                    ]),
-                    _vm._v(" "),
-                    _vm._l(_vm.getYearArray, function(year) {
-                      return _c("option", [_vm._v(_vm._s(year))])
-                    })
-                  ],
-                  2
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "unified-search__form-date-to" }, [
-                _c("label", { attrs: { for: "date-month-to" } }, [
-                  _vm._v("To")
-                ]),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.dateTo.month,
-                        expression: "queryObject.dateTo.month"
-                      }
-                    ],
-                    staticClass: "unified-search__form-date-month-to",
-                    attrs: { id: "date-month-to" },
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject.dateTo,
-                          "month",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { disabled: "", value: "" } }, [
-                      _vm._v("Month")
-                    ]),
-                    _vm._v(" "),
-                    _vm._l(_vm.getMonthsArray, function(month) {
-                      return _c("option", [_vm._v(_vm._s(month))])
-                    })
-                  ],
-                  2
-                ),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.dateTo.day,
-                        expression: "queryObject.dateTo.day"
-                      }
-                    ],
-                    staticClass: "unified-search__form-date-day-to",
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject.dateTo,
-                          "day",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { disabled: "", value: "" } }, [
-                      _vm._v("Day")
-                    ]),
-                    _vm._v(" "),
-                    _vm._l(_vm.getDayArray, function(day) {
-                      return _c("option", [_vm._v(_vm._s(day))])
-                    })
-                  ],
-                  2
-                ),
-                _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.queryObject.dateTo.year,
-                        expression: "queryObject.dateTo.year"
-                      }
-                    ],
-                    staticClass: "unified-search__form-date-year-to",
-                    on: {
-                      keypress: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        $event.preventDefault()
-                        $event.stopPropagation()
-                        return _vm.onInputEnter.apply(null, arguments)
-                      },
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          _vm.queryObject.dateTo,
-                          "year",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { disabled: "", value: "" } }, [
-                      _vm._v("Year")
-                    ]),
-                    _vm._v(" "),
-                    _vm._l(_vm.getYearArray, function(year) {
-                      return _c("option", [_vm._v(_vm._s(year))])
-                    })
-                  ],
-                  2
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "unified-search__form-lastupdater" }, [
-                _c("label", { attrs: { for: "lastupdater" } }, [
-                  _vm._v("Last editor of file")
-                ]),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.queryObject.last_updater,
-                      expression: "queryObject.last_updater"
-                    }
-                  ],
-                  staticClass: "unified-search__form-owner-lastupdater",
-                  attrs: {
-                    id: "lastupdater",
-                    value: "",
-                    placeholder: "Last editor of file"
-                  },
-                  domProps: { value: _vm.queryObject.last_updater },
-                  on: {
-                    keypress: function($event) {
-                      if (
-                        !$event.type.indexOf("key") &&
-                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                      ) {
-                        return null
-                      }
-                      $event.preventDefault()
-                      $event.stopPropagation()
-                      return _vm.onInputEnter.apply(null, arguments)
-                    },
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(
-                        _vm.queryObject,
-                        "last_updater",
-                        $event.target.value
-                      )
-                    }
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", [
-                _c(
-                  "button",
-                  {
-                    on: {
-                      click: function($event) {
-                        return _vm.onInput()
-                      }
-                    }
-                  },
-                  [_vm._v("Submit")]
-                )
-              ]),
-              _vm._v(" "),
-              !!_vm.queryObject && !_vm.isLoading
-                ? _c("input", {
-                    staticClass: "unified-search__form-reset icon-close",
-                    attrs: {
-                      type: "reset",
-                      "aria-label": _vm.t("core", "Reset search"),
-                      value: ""
-                    }
-                  })
-                : _vm._e()
-            ]
-          ),
-          _vm._v(" "),
-          _vm.availableFilters.length > 1
-            ? _c(
-                "Actions",
+              _c(
+                "select",
                 {
-                  staticClass: "unified-search__filters",
-                  attrs: { placement: "bottom" }
-                },
-                _vm._l(_vm.availableFilters, function(type) {
-                  return _c(
-                    "ActionButton",
+                  directives: [
                     {
-                      key: type,
-                      attrs: {
-                        icon: "icon-filter",
-                        title: _vm.t("core", "Search for {name} only", {
-                          name: _vm.typesMap[type]
-                        })
-                      },
-                      on: {
-                        click: function($event) {
-                          return _vm.onClickFilter("in:" + type)
-                        }
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.dateFrom.month,
+                      expression: "queryObject.dateFrom.month"
+                    }
+                  ],
+                  staticClass: "unified-search__form-date-month",
+                  attrs: { id: "date-month-from" },
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
                       }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
                     },
-                    [_vm._v("\n\t\t\t\t" + _vm._s("in:" + type) + "\n\t\t\t")]
-                  )
-                }),
-                1
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject.dateFrom,
+                        "month",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { attrs: { disabled: "", value: "" } }, [
+                    _vm._v("Month")
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.getMonthsArray, function(month) {
+                    return _c("option", [_vm._v(_vm._s(month))])
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.dateFrom.day,
+                      expression: "queryObject.dateFrom.day"
+                    }
+                  ],
+                  staticClass: "unified-search__form-date-day-from",
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject.dateFrom,
+                        "day",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { attrs: { disabled: "", value: "" } }, [
+                    _vm._v("Day")
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.getDayArray, function(day) {
+                    return _c("option", [_vm._v(_vm._s(day))])
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.dateFrom.year,
+                      expression: "queryObject.dateFrom.year"
+                    }
+                  ],
+                  staticClass: "unified-search__form-date-year-from",
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject.dateFrom,
+                        "year",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { attrs: { disabled: "", value: "" } }, [
+                    _vm._v("Year")
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.getYearArray, function(year) {
+                    return _c("option", [_vm._v(_vm._s(year))])
+                  })
+                ],
+                2
               )
-            : _vm._e()
-        ],
-        1
-      ),
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "unified-search__form-date-to" }, [
+              _c("label", { attrs: { for: "date-month-to" } }, [_vm._v("To")]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.dateTo.month,
+                      expression: "queryObject.dateTo.month"
+                    }
+                  ],
+                  staticClass: "unified-search__form-date-month-to",
+                  attrs: { id: "date-month-to" },
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject.dateTo,
+                        "month",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { attrs: { disabled: "", value: "" } }, [
+                    _vm._v("Month")
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.getMonthsArray, function(month) {
+                    return _c("option", [_vm._v(_vm._s(month))])
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.dateTo.day,
+                      expression: "queryObject.dateTo.day"
+                    }
+                  ],
+                  staticClass: "unified-search__form-date-day-to",
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject.dateTo,
+                        "day",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { attrs: { disabled: "", value: "" } }, [
+                    _vm._v("Day")
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.getDayArray, function(day) {
+                    return _c("option", [_vm._v(_vm._s(day))])
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.queryObject.dateTo.year,
+                      expression: "queryObject.dateTo.year"
+                    }
+                  ],
+                  staticClass: "unified-search__form-date-year-to",
+                  on: {
+                    keypress: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      $event.preventDefault()
+                      $event.stopPropagation()
+                      return _vm.onInputEnter.apply(null, arguments)
+                    },
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.queryObject.dateTo,
+                        "year",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { attrs: { disabled: "", value: "" } }, [
+                    _vm._v("Year")
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.getYearArray, function(year) {
+                    return _c("option", [_vm._v(_vm._s(year))])
+                  })
+                ],
+                2
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "unified-search__form-lastupdater" }, [
+              _c("label", { attrs: { for: "lastupdater" } }, [
+                _vm._v("Last editor of file")
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.queryObject.last_updater,
+                    expression: "queryObject.last_updater"
+                  }
+                ],
+                staticClass: "unified-search__form-owner-lastupdater",
+                attrs: {
+                  id: "lastupdater",
+                  value: "",
+                  placeholder: "Last editor of file"
+                },
+                domProps: { value: _vm.queryObject.last_updater },
+                on: {
+                  keypress: function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                    ) {
+                      return null
+                    }
+                    $event.preventDefault()
+                    $event.stopPropagation()
+                    return _vm.onInputEnter.apply(null, arguments)
+                  },
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(
+                      _vm.queryObject,
+                      "last_updater",
+                      $event.target.value
+                    )
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", [
+              _c(
+                "button",
+                {
+                  on: {
+                    click: function($event) {
+                      return _vm.onInput()
+                    }
+                  }
+                },
+                [_vm._v("Submit")]
+              )
+            ]),
+            _vm._v(" "),
+            !!_vm.queryObject && !_vm.isLoading
+              ? _c("input", {
+                  staticClass: "unified-search__form-reset icon-close",
+                  attrs: {
+                    type: "reset",
+                    "aria-label": _vm.t("core", "Reset search"),
+                    value: ""
+                  }
+                })
+              : _vm._e()
+          ]
+        )
+      ]),
       _vm._v(" "),
       !_vm.hasResults
         ? [_vm.isLoading ? _c("SearchResultPlaceholders") : _vm._e()]

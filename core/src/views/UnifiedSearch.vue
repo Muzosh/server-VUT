@@ -206,7 +206,7 @@
 			</form>		
 
 			<!-- Search filters--> 
-			<Actions v-if="availableFilters.length > 1" class="unified-search__filters" placement="bottom">
+			<!--<Actions v-if="availableFilters.length > 1" class="unified-search__filters" placement="bottom">
 				<ActionButton v-for="type in availableFilters"
 					:key="type"
 					icon="icon-filter"
@@ -214,7 +214,7 @@
 					@click="onClickFilter(`in:${type}`)">
 					{{ `in:${type}` }}
 				</ActionButton>
-			</Actions>
+			</Actions>-->
 		</div>
 
 		<template v-if="!hasResults">
@@ -622,8 +622,9 @@ export default {
 		 */
 		stringifyQuery(){
 			var resultArray = [""]
-			if(!this.queryObject.name.includes("__") && this.queryObject.name.length > 1){
-				resultArray[0] = this.queryObject.name
+			if(this.queryObject.name.length > 1 && !this.queryObject.name.endsWith('\\')){
+				const nameString = this.queryObject.name
+				resultArray[0] = nameString.replace('::', '\\:\\:').replace('__', '\\_\\_')	
 			}else{
 				resultArray[0] = ""
 			}
@@ -641,10 +642,12 @@ export default {
 				resultArray.push("mimetype::" + this.queryObject.mimetype)
 			}
 
-			if(this.queryObject.owner !== "" &&
-				!this.queryObject.owner.includes("__") && 
-				!this.queryObject.owner.includes("::")){
-				resultArray.push("owner::" + this.queryObject.owner)
+			if(this.queryObject.owner !== "" && 
+					!this.queryObject.owner.endsWith('\\') &&
+					!this.queryObject.owner.includes('__') &&
+					!this.queryObject.owner.includes('::')){
+				const ownerString = this.queryObject.owner
+				resultArray.push("owner::" + ownerString)
 			}
 
 			if(this.queryObject.dateFrom.month !== "" && this.queryObject.dateFrom.day !== "" && this.queryObject.dateFrom.year !== ""){
@@ -662,12 +665,14 @@ export default {
 			}
 
 			if(this.queryObject.last_updater !== "" && 
-				!this.queryObject.last_updater.includes("__") && 
-				!this.queryObject.last_updater.includes("::")){
-				resultArray.push("last_updater::" + this.queryObject.last_updater)
+					!this.queryObject.last_updater.endsWith('\\') &&
+					!this.queryObject.last_updater.includes('__') &&
+					!this.queryObject.last_updater.includes('::')){
+				const lastUpdaterOwner = this.queryObject.last_updater
+				resultArray.push("last_updater::" + lastUpdaterOwner)
 			}
 
-			return resultArray.join("__")
+			return resultArray.join("__").replace('in', '\\in')
 		},
 
 		/**
