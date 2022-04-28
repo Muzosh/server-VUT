@@ -6,6 +6,8 @@
     "ova": ["application/x-disk-image"],
     "bin": ["application/x-disk-image",
             "application/octet-stream"],
+    "rpm": ["application/x-disk-image",
+            "application/octet-stream"],
     "aac": ["audio/aac"],
     "abw": ["application/x-abiword"],
     "arc": ["application/x-freearc"],

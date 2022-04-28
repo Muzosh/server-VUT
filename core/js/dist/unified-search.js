@@ -37612,9 +37612,7 @@ var render = function() {
               attrs: {
                 type: "search",
                 value: "",
-                placeholder: _vm.t("core", "Search {types} …", {
-                  types: _vm.typesNames.join(", ")
-                })
+                placeholder: "Filter by file name"
               },
               domProps: { value: _vm.queryObject.name },
               on: {

@@ -47,8 +47,8 @@
 					class="unified-search__form-input"
 					type="search"
 					value=""
+					placeholder="Filter by file name"
 					:class="{'unified-search__form-input--with-reset': !!queryObject}"
-					:placeholder="t('core', 'Search {types} …', { types: typesNames.join(', ') })"
 					@keypress.enter.prevent.stop="onInputEnter">
 
 				<!-- Additional filters-->
@@ -182,6 +182,7 @@
 					</select>
 				</div>
 
+				<!--Last editor of file (last_updater)-->
 				<div class="unified-search__form-lastupdater">
 					<label for="lastupdater">Last editor of file</label>
 					<input
@@ -193,6 +194,7 @@
 						@keypress.enter.prevent.stop="onInputEnter">
 				</div>
 
+				<!--Submit button-->
 				<div>
 					<button v-on:click="onInput()">Submit</button>
 				</div>
