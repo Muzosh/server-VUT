@@ -158,7 +158,7 @@ class FilesSearchProvider implements IProvider {
 					case "mimetype":
 						switch($exploded[1]){
 							case "text":
-								//Text mimetype is extended to PDFs, MS Word (.doc, .docx) and Open Office documents.
+								//Text mimetype is extended to PDFs, MS Word (.doc, .docx), Open Office documents and Epub.
 								$provisionalQueryArray = [
 									new SearchComparison(ISearchComparison::COMPARE_LIKE, 'mimetype', 'text/%'),
 									new SearchComparison(ISearchComparison::COMPARE_EQUAL, 'mimetype', 'application/pdf'),
