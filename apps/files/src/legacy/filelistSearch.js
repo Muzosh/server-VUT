@@ -26,15 +26,21 @@ import { subscribe } from '@nextcloud/event-bus'
 
 	const FilesPlugin = {
 		attach(fileList) {
+			//Listens to the emittor in UnitedSearch.vue.
+			//Gets a JSON object of filter results.
 			subscribe('nextcloud:unified-search.searchFiles', ({ query }) => {
+				//Initializes an array of search results
+				//JSON -> Array
 				var resultArray = [];
 				if(query.length > 0){
 				  for(const data of query[0].list){
+					//Pushes a name of a file in the JSON object of filter results.
 					resultArray.push(data.title);
 				  }
 				  fileList.setFilter(resultArray);
-				}else fileList.setFilter([]);
+				}else fileList.setFilter([]); //Sends emty array if no matching results of filtering
 			})
+			//Sends an array with emty string if user wishes to clear the filter form.
 			subscribe('nextcloud:unified-search.reset', () => {
 				this.query = null
 				fileList.setFilter(['']);

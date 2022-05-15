@@ -54,6 +54,7 @@
 			totalDirs: 0,
 			totalHidden: 0,
 			totalSize: 0,
+			//Filter attribute changed to an array of filter results
 			filter:[''],
 			sumIsPending:false
 		},
@@ -127,10 +128,10 @@
 				this.update();
 			}
 		},
+		//Sets filter results. Function called in filelist.js
 		setFilter: function(filter, files){
 			this.summary.filter = [];
 			for(var individualFilter of filter){
-				//console.log("Setting: " + individualFilter);
 				this.summary.filter.push(individualFilter);
 			}
 			this.calculate(files);
@@ -212,9 +213,11 @@
 		},
 
 		/**
-		 * Renders the file summary element
+		 * Renders the file summary element.
+		 * Not used here.
 		 */
 		update: function() {
+			//This if parctically turns off the feature.
 			if(1===1){
 				return;
 			}

@@ -472,6 +472,7 @@ class Version13000Date20170718121200 extends SimpleMigrationStep {
 				'notnull' => false,
 				'length' => 64,
 			]);
+			//Adds the last_updater attribute upon database initialization.
 			$table->addColumn('last_updater', 'string', [
 				'notnull' => true,
 				'length' => 255,

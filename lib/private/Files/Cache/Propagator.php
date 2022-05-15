@@ -109,7 +109,7 @@ class Propagator implements IPropagator {
 				->set('last_updater', $builder->createNamedParameter(\OC_User::getUser(), IQueryBuilder::PARAM_STR))
 				->where($builder->expr()->eq('item_source', $builder->createNamedParameter($fileidShare, IQueryBuilder::PARAM_INT)));
 			$builder->execute();
-		}else syslog(LOG_INFO, "Not found for: " . $internalPath);
+		}
 
 		$builder = $this->connection->getQueryBuilder();
 		$builder->update('filecache')

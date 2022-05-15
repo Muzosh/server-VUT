@@ -196,6 +196,7 @@ class FilesSearchProvider implements IProvider {
 						array_push($queryArray, $provisionalQuery);
 						break;
 					case "owner":
+						//Filters by File owner.
 						array_push($queryArray, new SearchComparison(ISearchComparison::COMPARE_LIKE, 'owner', '%' . $exploded[1] . '%'));
 						break;
 					case "lte":

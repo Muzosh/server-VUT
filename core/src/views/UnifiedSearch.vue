@@ -34,14 +34,18 @@
 				fill-color="var(--color-primary-text)" />
 		</template>
 
-		<!-- Search form & filters wrapper -->
+		<!-- Search form & filters wrapper 
+				Value inputted into the fileds are inserted into
+				corrsponding spot in the queryObject attribute (defined in v-model).-->
 		<div class="unified-search__input-wrapper">
 			<form class="unified-search__form"
 				role="search"
 				:class="{'icon-loading-small': isLoading}"
 				@submit.prevent.stop="onInputEnter"
 				@reset.prevent.stop="onReset">
-				<!-- Search input -->
+				<!--Search input
+					Modified original input for Unified Search
+					Now used for searching by file name substring -->
 				<input ref="input"
 					v-model="queryObject.name"
 					class="unified-search__form-input"
@@ -52,7 +56,8 @@
 					@keypress.enter.prevent.stop="onInputEnter">
 
 				<!-- Additional filters-->
-				<!-- Media type selector-->
+				<!--Media type selector
+					Scrolldown menu for filtering by file type (mapped onto a set of Media types)-->
 				<div class="unified-search__form-mimetype">
 					<label for="morethan">Type of media</label>
 					<select
@@ -72,6 +77,11 @@
 				</div>
 				
 				<!--File size selector-->
+				<!--First component of the file size filter.
+					This one accepts all files which size is larger than the size
+					written into the field.
+					It consists of an input field that accepts characters [0-9]
+					and a dropdown menu with supported data size units. MB is defualt.-->
 				<div class="unified-search__form-morethan">
 					<label for="morethan">Size more than</label>
 					<input
@@ -94,6 +104,9 @@
 					</select>
 				</div>
 
+				<!--Second component of the file size filter.
+				 	This one accepts all files which size is smaller than the size
+					written into the field.-->
 				<div class="unified-search__form-lessthan">
 					<label for="lessthan">Size less than</label>
 					<input
@@ -117,6 +130,10 @@
 				</div>
 
 				<!--Owner selector-->
+				<!--This field filters by file owner and accepts a substring of
+					NextCloud User ID.
+					File owner is defined only for shared files. 
+					All other files won't be accepted by the filter.-->
 				<div class="unified-search__form-owner">
 					<label for="owner">File owner</label>
 					<input
@@ -129,6 +146,10 @@
 				</div>
 				
 				<!--Last edit date - from-->
+				<!--Consists of two components similarly to 'File size selector'.
+					First one below this comment accepts all files that were last modified *after*
+					the date inputted.
+					Both components consit of 3 dropdwon menus.-->
 				<div class="unified-search__form-date-from">
 					<label for="date-month-from">From </label>
 					<select
@@ -156,6 +177,8 @@
 				</div>
 
 				<!--Last edit date - to-->
+				<!--Second component accepts all files last modified *before*
+				the date inputted.-->
 				<div class="unified-search__form-date-to">
 					<label for="date-month-to">To</label>
 					<select
@@ -183,6 +206,9 @@
 				</div>
 
 				<!--Last editor of file (last_updater)-->
+				<!--Filters files by NextCloud User ID of the user who last edited or shared
+					a file.
+					Input of the citeria is a substring of NextCloud User ID.-->
 				<div class="unified-search__form-lastupdater">
 					<label for="lastupdater">Last editor of file</label>
 					<input
@@ -195,11 +221,13 @@
 				</div>
 
 				<!--Submit button-->
+				<!--Starts the filtering process-->
 				<div>
 					<button v-on:click="onInput()">Submit</button>
 				</div>
 
 				<!-- Reset search button -->
+				<!--Clears the filter form-->
 				<input v-if="!!queryObject && !isLoading"
 					type="reset"
 					class="unified-search__form-reset icon-close"
@@ -208,6 +236,8 @@
 			</form>		
 
 			<!-- Search filters--> 
+			<!--Uncomment to allow NextCloud App filters-->
+
 			<!--<Actions v-if="availableFilters.length > 1" class="unified-search__filters" placement="bottom">
 				<ActionButton v-for="type in availableFilters"
 					:key="type"
@@ -222,6 +252,8 @@
 		<template v-if="!hasResults">
 			<!-- Loading placeholders -->
 			<SearchResultPlaceholders v-if="isLoading" />
+			
+			<!--Uncomment to allow some system messages-->
 
 			<!--<EmptyContent v-else-if="isValidQuery" icon="icon-search">
 				<Highlight :text="t('core', 'No results for {query}', { queryArray })" :search="queryArray" />
@@ -241,6 +273,8 @@
 		</template>
 
 		<!-- Grouped search results -->
+		<!--Uncomment to show list of results inside the UnifiedSearch window-->
+
 		<!--<template v-else>
 			<ul v-for="({list, type}, typesIndex) in orderedResults"
 				:key="type"
@@ -320,7 +354,7 @@ export default {
 			requests: [],
 			// List of all results
 			results: {},
-
+			//Temporary storage of filter query before the 'Submit' button is hit
 			queryObject: {
 							name: "",
 							mimetype: "",
@@ -624,26 +658,31 @@ export default {
 		 */
 		stringifyQuery(){
 			var resultArray = [""]
+			//Adds the criteria 'file name' to the filter query.
+			//Doesn't accept short string and escape character at the end of the string.
 			if(this.queryObject.name.length > 1 && !this.queryObject.name.endsWith('\\')){
 				const nameString = this.queryObject.name
 				resultArray[0] = nameString.replace('::', '\\:\\:').replace('__', '\\_\\_')	
 			}else{
 				resultArray[0] = ""
 			}
+			//Adds 'file size' criteria to the filter query.
+			//Filter accepts files larger than value provided.
 			if(this.queryObject.size.sizeMoreThan.size !== ""){
 				resultArray.push("gte::" + this.queryObject.size.sizeMoreThan.size.toString() + "::" +
 				this.queryObject.size.sizeMoreThan.unit.toString())
 			}
-
+			//Filter accepts files smaller than value provided.
 			if(this.queryObject.size.sizeLessThan.size !== ""){
 				resultArray.push("lte::" + this.queryObject.size.sizeLessThan.size.toString() + "::" + 
 				this.queryObject.size.sizeLessThan.unit.toString())
 			}
-
+			//Adds the 'file type' criteria to the filter query.
 			if(this.queryObject.mimetype !== ""){
 				resultArray.push("mimetype::" + this.queryObject.mimetype)
 			}
-
+			//Adds 'file owner' criteria to the filter query
+			//Substrings '\', '__' and '::' aren't accepted.
 			if(this.queryObject.owner !== "" && 
 					!this.queryObject.owner.endsWith('\\') &&
 					!this.queryObject.owner.includes('__') &&
@@ -651,21 +690,23 @@ export default {
 				const ownerString = this.queryObject.owner
 				resultArray.push("owner::" + ownerString)
 			}
-
+			//Adds 'last edit date' criteria to the filter query.
+			//Filter accepts files last modified after the date provided.
 			if(this.queryObject.dateFrom.month !== "" && this.queryObject.dateFrom.day !== "" && this.queryObject.dateFrom.year !== ""){
 				resultArray.push("date_from::" + 
 									this.queryObject.dateFrom.month.toString() + "::" + 
 									this.queryObject.dateFrom.day.toString() + "::" +
 									this.queryObject.dateFrom.year.toString())
 			}
-
+			//Filter accepts files last modified before the date provided.
 			if(this.queryObject.dateTo.month !== "" && this.queryObject.dateTo.day !== "" && this.queryObject.dateTo.year !== ""){
 				resultArray.push("date_to::" + 
 									this.queryObject.dateTo.month.toString() + "::" + 
 									this.queryObject.dateTo.day.toString() + "::" +
 									this.queryObject.dateTo.year.toString())
 			}
-
+			//Adds 'last editor' criteria to the filter query.
+			//Substrings '\', '__' and '::' aren't accepted.
 			if(this.queryObject.last_updater !== "" && 
 					!this.queryObject.last_updater.endsWith('\\') &&
 					!this.queryObject.last_updater.includes('__') &&
@@ -673,18 +714,18 @@ export default {
 				const lastUpdaterOwner = this.queryObject.last_updater
 				resultArray.push("last_updater::" + lastUpdaterOwner)
 			}
-
+			//Escapes substring 'in' (so NextCloud App filter isn't triggered) and returns full filter query.
 			return resultArray.join("__").replace('in', '\\in')
 		},
 
 		/**
-		 * Start searching on input
+		 * Start searching on 'Submit' button click
 		 */
 		async onInput() {
 			// emit the search query
 
 			let query = this.stringifyQuery()
-
+			//Emits the query of the former Unified Search field in the filter form to supported NextCloud Apps.
 			emit('nextcloud:unified-search.search', { query: this.queryObject.name })
 			// Do not search if not long enoug
 			if (query.trim() === '' || (query.trim() < minSearchLength)) {
@@ -693,17 +734,17 @@ export default {
 
 			let types = this.typesIDs
 
-			// Filter out types
+			// Filter out types. Practically not used.
 			if (this.usedFiltersNot.length > 0) {
 				types = this.typesIDs.filter(type => this.usedFiltersNot.indexOf(type) === -1)
 			}
 
-			// Only use those filters if any and check if they are valid
+			// Only use those filters if any and check if they are valid. Practically not used.
 			if (this.usedFiltersIn.length > 0) {
 				types = this.typesIDs.filter(type => this.usedFiltersIn.indexOf(type) > -1)
 			}
 
-			// Remove any filters from the query
+			// Remove any filters from the query. Practically not used.
 			query = query.replace(regexFilterIn, '').replace(regexFilterNot, '')
 
 			// Reset search if the query changed
@@ -746,6 +787,7 @@ export default {
 						this.focused = 0
 					}
 					
+					//Emits results of proper filtering to the Files App (fileSearch.js).
 					emit('nextcloud:unified-search.searchFiles', { query: this.orderedResults})
 
 					return REQUEST_OK

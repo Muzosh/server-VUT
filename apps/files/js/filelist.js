@@ -167,7 +167,7 @@
 		_selectionSummary: null,
 
 		/**
-		 * If not empty, only files containing this string will be shown
+		 * If not empty, only files in the file list _filter will be shown
 		 * @type String[]
 		 */
 		_filter: [''],
@@ -3352,16 +3352,19 @@
 			this.setFilter(['']);
 		},
 		/**
-		 * hide files matching the given filter
+		 * hide files matching the given filter results
 		 * @param filter
 		 */
 		setFilter:function(filter) {
 			var total = 0;
+			//Don't apply filter again if the array of results of filtering is the same.
 			if (this._filter === filter) {
 				return;
 			}
 
 			this._filter = filter;
+			//Gives the filter results to filesummary.js which calcultaes and shows
+			//shown files statistics.
 			this.fileSummary.setFilter(filter, this.files);
 			total = this.fileSummary.getTotal();
 			if (!this.$el.find('.mask').exists()) {
@@ -3369,10 +3372,13 @@
 			}
 
 			var visibleCount = 0;
-
+			//Comapres individual file to the filter results
+			//and decides if the file should be shown or hidden.
 			function filterRows(tr) {
 				var $e = $(tr);
+				//Iterates through a field of filter results.
 				for(var individualFilter of filter){
+					//Shows a file if it's in filter results.
 					if ($e.data('file').toString().indexOf(individualFilter) !== -1) {
 						visibleCount++;
 						$e.removeClass('hidden');
@@ -3380,14 +3386,17 @@
 				}
 			}
 
-				var $trs = this.$fileList.find('tr');
-				$($trs).addClass('hidden');
-				do {
-					_.each($trs, filterRows);
-					if (visibleCount < total) {
-						$trs = this._nextPage(false);
-					}
-				} while (visibleCount < total && $trs.length > 0);
+			var $trs = this.$fileList.find('tr');
+			//First, hides all files.
+			$($trs).addClass('hidden');
+			do {
+				//Iterates through all files in a folder. And calls filterRows function defined above
+				//onto each file.
+				_.each($trs, filterRows);
+				if (visibleCount < total) {
+					$trs = this._nextPage(false);
+				}
+			} while (visibleCount < total && $trs.length > 0);
 
 			this.$container.trigger('scroll');
 		},

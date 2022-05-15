@@ -132,7 +132,6 @@ class DefaultShareProvider implements IShareProvider {
 	 */
 	public function create(\OCP\Share\IShare $share) {
 		$qb = $this->dbConn->getQueryBuilder();
-		syslog(LOG_INFO, "DEFUALT PROVIDER");
 		$qb->insert('share');
 		$qb->setValue('share_type', $qb->createNamedParameter($share->getShareType()));
 
@@ -263,6 +262,7 @@ class DefaultShareProvider implements IShareProvider {
 				->set('expiration', $qb->createNamedParameter($share->getExpirationDate(), IQueryBuilder::PARAM_DATE))
 				->set('note', $qb->createNamedParameter($share->getNote()))
 				->set('accepted', $qb->createNamedParameter($share->getStatus()))
+				//Update last_updater upon change in status of sharing.
 				->set('last_updater', $qb->createNamedParameter(\OC_User::getUser()))
 				->execute();
 		} elseif ($share->getShareType() === IShare::TYPE_GROUP) {
